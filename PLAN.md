@@ -1,6 +1,6 @@
 # Production plan
 
-**Current state:** local playable build in progress. Three original code-generated demo tracks, procedural 3D arena, automatic beat cues, settings, and initial tests exist. Public release gates remain open. See [README.md](README.md) for current files.
+**Current state:** playable build and public GitHub repository exist. `main` is the protected default branch, `dev` is the working branch, and GitHub Actions passed on both initial branches. Vercel account/project connection and public deployment remain pending. Three original code-generated demo tracks, procedural 3D arena, automatic beat cues, settings, and initial tests exist. Public release gates remain open. See [README.md](README.md) for current files.
 
 ## Product
 
@@ -27,7 +27,7 @@ Vite + React + TypeScript produce a static app. Three.js and React Three Fiber r
 - No user-level analytics, advertising, or third-party scripts at initial launch. The hosting provider still processes request metadata; the notice must describe the observed data flow. See [privacy](docs/PRIVACY.md).
 - Light effects are safe by default, with reduced flash and motion options. See [accessibility](docs/ACCESSIBILITY.md).
 - Any new accounts, uploads, user-selected music, social features, payments, or ads trigger a new architecture, rights, privacy, and security review.
-- No public launch until the legal operator, commercial status, launch countries, and music source are known. These are tracked in [decisions](docs/DECISIONS.md).
+- No public launch until the pending business contact, rights review, privacy notice, regional review, and release evidence are complete. Operator, initial monetization posture, worldwide intent, and original music source are recorded in [decisions](docs/DECISIONS.md).
 
 ## Release authority
 
