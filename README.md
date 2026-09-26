@@ -23,6 +23,7 @@ Future project work follows the documentation upkeep rule in [AGENTS.md](AGENTS.
 | How will accessibility be verified? | [docs/ACCESSIBILITY.md](docs/ACCESSIBILITY.md) |
 | How will quality and performance be tested? | [docs/QUALITY.md](docs/QUALITY.md) |
 | How will the app be released and run? | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md), [docs/OPERATIONS.md](docs/OPERATIONS.md) |
+| Which tools and Codex plugins are needed? | [docs/TOOLS_AND_PLUGINS.md](docs/TOOLS_AND_PLUGINS.md) |
 | Which choices are unresolved? | [docs/DECISIONS.md](docs/DECISIONS.md) |
 
 The documents describe intended controls. Checked release gates require evidence from the eventual built application; writing a plan does not count as passing a gate.
