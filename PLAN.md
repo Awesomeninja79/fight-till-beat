@@ -1,6 +1,6 @@
 # Production plan
 
-**Current state:** playable build, public GitHub repository, and a Vercel project connected to GitHub exist. `main` is the protected default branch, `dev` is the working branch, and GitHub Actions passed on both branches. Vercel's first `dev` deployment was labeled Production despite `main` branch tracking; it was canceled before becoming ready. The dashboard confirms no production deployment. Preview-only builds are enabled while the protected `dev` pipeline is verified; public production remains gated. Three original code-generated demo tracks, procedural 3D arena, automatic beat cues, settings, and initial tests exist. See [README.md](README.md) for current files.
+**Current state:** playable build, public GitHub repository, and a Vercel project connected to GitHub exist. `main` is the protected default branch, `dev` is the working branch, and GitHub Actions passed on both branches through `ad10d44`. Vercel's first `dev` deployment was labeled Production and canceled; subsequent `dev` commit `27d5048` deployed successfully as a protected Preview. The dashboard confirms no production deployment, and production builds remain skipped. Three original code-generated demo tracks, procedural 3D arena, automatic beat cues, settings, and initial tests exist. Public production remains gated. See [README.md](README.md) for current files.
 
 ## Product
 

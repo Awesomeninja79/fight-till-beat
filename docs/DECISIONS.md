@@ -14,6 +14,6 @@ Planning assumptions are explicit so implementation can proceed where safe. The 
 | D-08 | Future streaming-service integration | None | Future roadmap | Separate negotiated rights and provider terms |
 | D-09 | Custom domain/brand name | Undecided | Branding and deployment | Trademark check, DNS, public URLs |
 | D-10 | Budget and operations coverage | Undecided | Hosting setup | Plan tier, spend alerts, response commitments |
-| D-11 | Vercel first deployment | First `dev` deployment was labeled Production and canceled. Preview-only builds are now enabled for a subsequent `dev` test; verify its environment and access protection before declaring the pipeline ready. | Preview pipeline | No accidental public deployment while release gates remain open |
+| D-11 | Vercel first deployment | First `dev` deployment was labeled Production and canceled. A later `dev` commit (`27d5048`) deployed Ready as Preview; unauthenticated access redirected to Vercel SSO. Keep preview-only builds until public release gates pass. | Preview pipeline | No accidental public deployment while release gates remain open |
 
 When a decision changes, update the affected source-of-truth documents, rights records, tests, and release gates. A larger catalog follows [CATALOG_EXPANSION.md](CATALOG_EXPANSION.md); adding an AI agent is not a prerequisite for beat tracking.

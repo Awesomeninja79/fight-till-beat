@@ -10,7 +10,7 @@
 | Verification | Vitest, Playwright, GitHub Actions | Cue/content checks, build, desktop and mobile browser flows. |
 | Hosting | Vercel Git integration, after account setup | Preview from `dev`, production from approved merges to `main`. |
 
-GitHub and Vercel are available as Codex connections in this workspace. The GitHub connection can inspect repositories and CI, while the Git CLI handles local commits and pushes. The operator's Vercel account is signed in and the project is connected to GitHub. The preview pipeline remains under verification after Vercel labeled its first `dev` deployment Production. No additional Codex plugin is required for the current three-song game.
+GitHub and Vercel are available as Codex connections in this workspace. The GitHub connection can inspect repositories and CI, while the Git CLI handles local commits and pushes. The operator's Vercel account is signed in, the project is connected to GitHub, and `dev` produced a protected Vercel Preview deployment. No additional Codex plugin is required for the current three-song game.
 
 ## Optional later
 
