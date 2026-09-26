@@ -1,6 +1,6 @@
 # Fight Till Beat
 
-Playable development build for a browser based 3D music-fighting experience. Three original code-generated demo tracks, a procedural disco arena, automatic choreography, controls, and browser checks are implemented locally. The [public GitHub repository](https://github.com/Awesomeninja79/fight-till-beat) has `main` as its default branch and `dev` for ongoing work. **No public game deployment exists yet; rights, privacy contact, and release review remain open.**
+Playable development build for a browser based 3D music-fighting experience. Three original code-generated demo tracks, a procedural disco arena, automatic choreography, controls, and browser checks are implemented locally. The [public GitHub repository](https://github.com/Awesomeninja79/fight-till-beat) has `main` as its default branch and `dev` for ongoing work. The [Vercel project](https://vercel.com/nsrathore7912-4985s-projects/fight-till-beat) is connected for protected previews, with production builds temporarily disabled. **No public game deployment exists yet; rights, privacy contact, and release review remain open.**
 
 Run locally after `pnpm install` with `pnpm dev`. Run logic/content/build checks with `pnpm check`; run browser flows with `pnpm test:e2e`.
 

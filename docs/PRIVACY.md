@@ -16,6 +16,7 @@ The app will not claim “no data is collected.” Vercel describes request and 
 ## Controls and documentation
 
 - The individual operator is Neeraj Saini; launch is intended worldwide. A business contact address is pending, and no personal email should be published. Before launch, identify the contact, hosting account, processor relationship, log/retention settings, and where data may be handled. Draft the privacy notice from the observed production network/storage audit, not from assumptions.
+- The Vercel project-level option to improve models with this project's code/chat data was turned off during setup. Confirm the saved setting during release review; this does not replace the public privacy notice.
 - Do not set a tracking cookie or persistent identifier. If local preferences persist, say what keys exist and provide Reset Preferences. Do not put personal data in URL query strings.
 - Keep analytics off by default. If later enabled, document vendor, events, data fields, purpose, legal basis or consent requirement, retention, and withdrawal process before shipping. “Cookie-free” alone does not settle all privacy obligations.
 - Limit access to hosting dashboards and support email. Define a process to answer access/deletion requests applicable to the actual data held by the operator.
