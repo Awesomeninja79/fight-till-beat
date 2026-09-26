@@ -1,0 +1,47 @@
+[
+  {
+    "id": "neon-strike",
+    "title": "Neon Strike",
+    "artist": "Fight Till Beat Original",
+    "bpm": 128,
+    "durationSec": 67.5,
+    "mood": "ELECTRIC / HIGH ENERGY",
+    "colors": [
+      "#ff4ac6",
+      "#7c5cff"
+    ],
+    "audio": "/audio/neon-strike.wav",
+    "cues": "/content/neon-strike.json",
+    "rightsId": "MUSIC-001"
+  },
+  {
+    "id": "after-hours",
+    "title": "After Hours",
+    "artist": "Fight Till Beat Original",
+    "bpm": 112,
+    "durationSec": 68.57,
+    "mood": "DARK / HYPNOTIC",
+    "colors": [
+      "#26d7ff",
+      "#5347ed"
+    ],
+    "audio": "/audio/after-hours.wav",
+    "cues": "/content/after-hours.json",
+    "rightsId": "MUSIC-002"
+  },
+  {
+    "id": "laser-rush",
+    "title": "Laser Rush",
+    "artist": "Fight Till Beat Original",
+    "bpm": 142,
+    "durationSec": 67.61,
+    "mood": "FAST / EUPHORIC",
+    "colors": [
+      "#faff3d",
+      "#ff7d3b"
+    ],
+    "audio": "/audio/laser-rush.wav",
+    "cues": "/content/laser-rush.json",
+    "rightsId": "MUSIC-003"
+  }
+]

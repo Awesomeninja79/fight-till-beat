@@ -1,0 +1,32 @@
+# More songs and automatic beat analysis
+
+## Two catalog sizes
+
+**V1 curated catalog:** three to a few dozen songs whose rights and cue maps are reviewed manually. Static JSON and same-origin files remain simple, cheap to operate, and privacy-light. Search/filter UI can work on the local manifest.
+
+**Large managed catalog:** if songs are added regularly or the list becomes too large to ship as one manifest, add an authenticated internal publishing service, relational catalog database, object storage/CDN for audio and artwork, background analysis worker, and paginated public catalog API. Visitors still do not need accounts. This is a later architecture milestone, not a dependency of the first release.
+
+## Proposed ingestion pipeline for a large catalog
+
+```text
+rights/contract approval
+  → private upload + malware/format check + file hash
+  → audio encode and metadata extraction
+  → offline beat/onset/tempo/phrase candidate generation
+  → human music editor correction + choreography templates
+  → schema, sync, flash, and rights validation
+  → staged preview
+  → publish status + CDN assets + searchable catalog record
+```
+
+Catalog record: immutable ID/version, title, artist/credit, genre and mood tags, duration, artwork, audio object key and hash, cue-map key and hash, territory, license start/end, availability state, rights evidence reference, review approvals, published/withdrawn timestamps. The public API exposes only approved metadata and signed or public asset URLs appropriate to the license. Rights evidence stays private. A takedown switches availability off immediately and then removes assets/caches as allowed by the hosting design.
+
+The ingestion worker runs separately from the public web app. It can use Python and librosa for onset and beat candidate detection. Beat tracking is an estimation problem: half/double tempo, syncopation, intros, breaks, and tempo changes can be wrong. Review all launch songs and prioritize low-confidence sections for manual correction. Human-approved cue maps, not live detector output, drive the fight. [librosa beat tracking](https://librosa.org/doc/latest/auto_tutorials/03-advanced/plot_dynamic_beat.html), [onset detection](https://librosa.org/doc/main/auto_tutorials/01-intro/05-onsets.html).
+
+An **AI agent is not required**. Beat detection is signal analysis; an agent would add orchestration and review complexity without solving music rights or guaranteeing timing. A trained music model could later propose downbeats, sections, or move patterns, but it must run offline, record its model/version and outputs, and pass human review. Do not send licensed audio to a third-party AI provider unless the music agreement permits it and the provider's processing/privacy terms are reviewed. If “new sounds” means new effect sounds, produce or license them and add them to the effects bus and rights register. If it means newly composed songs, run the full ingestion process.
+
+## Music-service integrations
+
+A large list from a commercial streaming service is **not** equivalent to a cleared game catalog. For example, Spotify's current developer policy prohibits games and synchronization of recordings with visual media. Do not design this product around Spotify playback or Spotify catalog imports without a separate negotiated agreement and legal review. [Spotify developer policy](https://developer.spotify.com/policy), [Spotify compliance examples](https://developer.spotify.com/compliance-tips). Likewise, YouTube API access does not grant general rights to download/cache its audiovisual content for this game. [YouTube API policy](https://developers.google.com/youtube/terms/developer-policies).
+
+The feasible scalable route is a catalog of music the project owns or has directly licensed for interactive audiovisual use, served by its own authorized storage/CDN. Contract terms determine territories, expirations, previews, cache behavior, and takedown process.
