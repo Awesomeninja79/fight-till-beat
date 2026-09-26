@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 test('choose a song, enter the arena, pause, and return to the track list', async ({ page }) => {
+  test.slow() // Includes two GPU screenshots; transport assertions keep their own timeouts.
   await page.goto('/')
   await expect(page.getByRole('heading', { name: /every beat/i })).toBeVisible()
   await page.getByRole('button', { name: 'Select After Hours' }).click()
@@ -8,8 +9,15 @@ test('choose a song, enter the arena, pause, and return to the track list', asyn
   await page.getByRole('button', { name: 'START THE FIGHT' }).click()
   await expect(page.getByText('NOW PLAYING')).toBeVisible({ timeout: 20_000 })
   await expect(page.getByText('After Hours', { exact: true })).toBeVisible()
-  await page.getByRole('button', { name: 'Pause fight' }).click()
+  await page.getByRole('button', { name: '50 TECHNIQUES' }).click()
+  await expect(page.locator('.move-book li')).toHaveCount(50)
+  await expect(page.locator('.move-book')).toContainText('Judo-inspired')
+  await page.getByRole('button', { name: 'Close', exact: true }).click()
   await expect(page.getByText('INTERMISSION')).toBeVisible()
+  await page.waitForTimeout(300)
+  const pausedFrame = await page.locator('canvas').screenshot()
+  await page.waitForTimeout(250)
+  expect((await page.locator('canvas').screenshot()).equals(pausedFrame)).toBe(true)
   await page.getByRole('button', { name: 'CHOOSE ANOTHER TRACK', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'THE TRACKLIST' })).toBeVisible()
 })
@@ -21,4 +29,26 @@ test('privacy and accessibility controls are reachable', async ({ page }) => {
   await page.getByRole('button', { name: 'Close settings' }).click()
   await page.getByRole('button', { name: 'PRIVACY' }).click()
   await expect(page.getByText('Neeraj Saini')).toBeVisible()
+})
+
+test('requested Lean On entry is credited and cannot start missing audio', async ({ page }) => {
+  const missingAudio: string[] = []
+  page.on('request', request => { if (request.url().includes('/audio/lean-on')) missingAudio.push(request.url()) })
+  await page.goto('/')
+  const entry = page.locator('article').filter({ hasText: 'Lean On' })
+  await expect(entry).toContainText('Major Lazer & DJ Snake feat. MØ')
+  await expect(entry).toContainText('AUDIO REQUIRED')
+  await expect(entry.getByRole('button')).toHaveCount(0)
+  expect(missingAudio).toEqual([])
+})
+
+test('failed character load blocks playback and Start retries successfully', async ({ page }) => {
+  await page.route('**/models/fighter-v1.glb', route => route.abort())
+  await page.goto('/')
+  await page.getByRole('button', { name: 'START THE FIGHT' }).click()
+  await expect(page.getByText('Fighters could not be loaded.', { exact: false }).first()).toBeVisible()
+  await expect(page.getByText('NOW PLAYING')).toHaveCount(0)
+  await page.unroute('**/models/fighter-v1.glb')
+  await page.getByRole('button', { name: 'START THE FIGHT' }).click()
+  await expect(page.getByText('NOW PLAYING')).toBeVisible({ timeout: 20_000 })
 })

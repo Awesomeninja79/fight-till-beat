@@ -8,7 +8,11 @@ Visitors choose one of three built-in songs, press **Start Fight**, and watch a 
 
 ## Technical baseline
 
-Vite + React + TypeScript produce a static app. Three.js and React Three Fiber render the arena. The Web Audio API supplies the authoritative song clock. Versioned JSON cue maps drive choreography and effects. The current build uses procedural original 3D geometry and three deterministic, code-generated WAV tracks; GLB imports remain a later art upgrade. Vercel is the proposed static host. Detailed responsibilities and interfaces are in [architecture](docs/ARCHITECTURE.md) and [audio/choreography](docs/AUDIO_AND_CHOREOGRAPHY.md).
+Latest owner-requested scope: 50 stylized techniques spanning boxing, karate, Muay Thai, taekwondo, kung fu/Wing Chun, capoeira, judo-inspired throws, and fictional jutsu. These combine source animation with parameterized procedural motion; they are not 50 motion-capture clips or certified demonstrations. Human models replace the DJ and audience placeholders; the crowd claps and pumps fists. Lean On is listed but awaits its authorized recording. The owner reports permission; scope evidence has not been supplied. Broad library search is researched but not connected.
+
+Vite + React + TypeScript produce a static app. Three.js and React Three Fiber render the arena. The Web Audio API supplies the authoritative song clock. Versioned JSON cue maps drive choreography and effects. The local character upgrade replaces primitive fighters with a textured, skinned Quaternius humanoid and independently cloned skeletons, colored outfits, jab/cross/reaction clips, accelerated combinations, airborne kick/finisher poses, and an anime camera/effects pass. The arena remains procedural; DJ and crowd now use the shared human rig; the three WAV tracks remain code-generated. Models and a reduced animation GLB are served locally and loaded before fight playback. Vercel is the proposed static host. Detailed responsibilities and interfaces are in [architecture](docs/ARCHITECTURE.md) and [audio/choreography](docs/AUDIO_AND_CHOREOGRAPHY.md).
+
+Character upgrade checks: eleven logic tests, content validation, production build, and six desktop/mobile Chromium flow tests passed locally on 2026-09-26. Chrome screenshots were inspected for humanoid rendering and combat poses. Full-track timing measurements, real-device performance, visual approval, asset/operator review, accessibility, and public release gates remain open. This local change has not been deployed.
 
 ## Delivery stages
 
@@ -32,3 +36,8 @@ Vite + React + TypeScript produce a static app. Three.js and React Three Fiber r
 ## Release authority
 
 The project owner approves public branding, licenses, privacy text, hosting account/budget, and the final production release after reviewing a working preview and evidence. A qualified lawyer should review rights and regional privacy obligations for the chosen launch markets. Engineering verifies the application and records results in the release checklist. Planning documents alone do not establish legal clearance.
+
+
+Latest verification: pnpm check passed with 19 logic tests, content validation, typecheck, and build. All 50 techniques are referenced in the playable cues, and all eight desktop/mobile Chromium flows passed, including the move book and unavailable Lean On entry. Final camera/DJ captures also verify frozen active-pose stability. See [quality](docs/QUALITY.md) for measured evidence and remaining release gates. The current work is local and has not been deployed.
+
+Deployment requested on 2026-09-26: the current build is being published to the existing protected dev preview. This supersedes the earlier local-only status; production release gates remain open. See the deployment log for completion evidence.

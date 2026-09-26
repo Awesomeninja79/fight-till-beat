@@ -2,6 +2,8 @@
 
 ## Release policy
 
+Lean On (MUSIC-004): the owner reports permission and possession of authorized audio. No recording or private scope evidence has been supplied. Metadata is listed with full artist credits; audio, preview, and choreography are absent. Do not substitute a sample, unofficial remix, or cover for the requested original. No free game-use source was verified in this work. Library/API access is not itself track clearance.
+
 An asset may be used in a protected prototype only if its use there is permitted. No asset may enter a public build unless its [asset register](../ASSET_REGISTER.md) row is marked Cleared, the evidence can be retrieved, and its credits/limitations are implemented. The project owner or designated rights reviewer signs off the release manifest. Legal counsel should review final agreements for the chosen launch markets. No technical control can guarantee freedom from claims.
 
 ## Music checklist

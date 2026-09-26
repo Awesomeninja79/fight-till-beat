@@ -38,3 +38,7 @@ Fingerprinted immutable audio/GLB/texture assets can have long cache lifetimes; 
 ## Rollback
 
 Keep the prior successful deployment. On a bad release, roll back the production alias, then verify the public URL and media files. For a rights issue, rollback alone may not remove a historically deployed asset; unpublish the catalog entry, remove/restrict the media object where possible, and review retained deployments/cache with the provider. Rehearse both paths before launch.
+
+## 2026-09-26 combat upgrade preview
+Owner requested deployment of the current build. Publish the tested humanoid/50-technique/cheering-crowd changes through `dev` to the existing protected preview. Three original tracks are playable; Lean On remains an audio-required metadata entry. No music provider is connected. Local evidence: `pnpm check` passed with 19 logic tests plus type/content/build checks; eight desktop/mobile browser flows passed, followed by corrected throw-framing and frozen-pose captures. Production settings and public release gates remain unchanged.
+The Vercel connector currently lacks access to this team; the authenticated Git credential helper is available, so Git-triggered deployment is the selected route. Record the resulting commit, deployment status and deployed checks after the push. Previous source baseline: `b9c9bae`; the existing protected preview remains the rollback reference until the new deployment succeeds.

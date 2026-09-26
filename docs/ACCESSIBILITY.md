@@ -13,6 +13,11 @@ Aim for WCAG 2.2 AA on the HTML controls, text, and navigation, with equivalent 
 
 ## Verification
 
+Anime direction controls: Reduced Motion uses a fixed wide shot with no roll, shake, push-in, or shot transitions; it suppresses moving slash arcs, impact shards, dash streaks, and beam sweeps, and reduces scarf movement. Essential combat remains visible. Reduced Flash caps localized effect opacity at 0.38 instead of 0.72 and retains the softer light pulse. Effects never replace the full screen with white/red impact frames. The floor no longer tilts. Camera and ambient scene animation freeze with song time when paused. These implementation controls still require measured flash and user accessibility review.
+
 Run automated accessibility checks on menu, loading, game overlay, error, credits, and privacy views; then do keyboard and screen-reader manual passes. Record desktop/mobile contrast and zoom behavior. Capture representative segments from every track for flash assessment. Check reduced-motion mode across every animation path, not just the menu.
 
 No release with an unsafe flash sequence, inaccessible Start/Pause controls, missing focus, or unreadable primary text. Document remaining limits of describing the 3D choreography and provide a concise text summary of the experience.
+
+## Technique/crowd follow-up
+Human audience cheering and DJ head motion stop under Reduced Motion, while the pre-existing fixed camera and reduced effects remain. Crowd/DJ motion follows the frozen song clock on pause. The 50-technique move book is an HTML list in a dialog; opening it pauses the fight. The technique label is visual and is not a rapidly changing live region. Lean On has a readable unavailable explanation with no inaccessible dummy play control. Full keyboard, focus management, screen-reader, flash, and real-device reviews remain open; automated pause tests alone do not establish accessibility compliance.

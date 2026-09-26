@@ -27,6 +27,10 @@ An **AI agent is not required**. Beat detection is signal analysis; an agent wou
 
 ## Music-service integrations
 
+Owner follow-up, 2026-09-26: wants search approaching mainstream-song coverage. No free provider meeting that scope was verified. [Jamendo's API](https://developer.jamendo.com/v3.0) offers a large independent catalog. Its [terms](https://devportal.jamendo.com/api_terms_of_use) require registered application credentials, per-track license compliance, attribution/backlinks, and a commercial agreement where applicable. No SDK, remote search, streaming, or analytics was added. Connecting a provider needs selection, app registration, license filtering, approved audio/cue ingestion, and network/privacy review.
+
+The current manifest supports `status: audio-required` entries with no playback URLs. Lean On is credited to Major Lazer & DJ Snake feat. MØ and awaits the owner-authorized file. Tency Music's [listing](https://www.tencymusic.com/music-licensing/major-lazer/lean-on.html) offers a separate cover recording, not the original or a verified free game-use source.
+
 A large list from a commercial streaming service is **not** equivalent to a cleared game catalog. For example, Spotify's current developer policy prohibits games and synchronization of recordings with visual media. Do not design this product around Spotify playback or Spotify catalog imports without a separate negotiated agreement and legal review. [Spotify developer policy](https://developer.spotify.com/policy), [Spotify compliance examples](https://developer.spotify.com/compliance-tips). Likewise, YouTube API access does not grant general rights to download/cache its audiovisual content for this game. [YouTube API policy](https://developers.google.com/youtube/terms/developer-policies).
 
 The feasible scalable route is a catalog of music the project owns or has directly licensed for interactive audiovisual use, served by its own authorized storage/CDN. Contract terms determine territories, expirations, previews, cache behavior, and takedown process.

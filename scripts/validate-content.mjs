@@ -6,14 +6,23 @@ const readJson = path => JSON.parse(readFileSync(join(root, path), 'utf8'))
 const tracks = readJson('content/tracks.json')
 const errors = []
 const validKinds = new Set(['punch', 'kick', 'dodge', 'dance', 'launch', 'finisher', 'step'])
+const techniques = JSON.parse(readFileSync(new URL('../src/game/techniques.json', import.meta.url), 'utf8'))
+const techniqueIds = new Set(techniques.map(t => t.id))
+const usedTechniques = new Set()
+if (techniques.length < 50 || techniqueIds.size !== techniques.length) errors.push('At least 50 uniquely identified techniques are required.')
 
-if (!Array.isArray(tracks) || tracks.length !== 3) errors.push('Launch catalog must contain three tracks.')
+if (!Array.isArray(tracks) || tracks.filter(t => t.status !== 'audio-required').length !== 3) errors.push('Preview catalog must contain three playable originals.')
 const ids = new Set()
 for (const track of tracks) {
   if (ids.has(track.id)) errors.push(`Duplicate track ID: ${track.id}`)
   ids.add(track.id)
   if (!track.rightsId || !track.title || !track.artist || !track.mood) errors.push(`Missing metadata for ${track.id}`)
   if (!/^#[0-9a-fA-F]{6}$/.test(track.colors?.[0] ?? '')) errors.push(`Invalid color for ${track.id}`)
+  if (track.status === 'audio-required') {
+    if (!track.availabilityNote || track.audio || track.cues) errors.push(`Requested track must explain missing audio and contain no playback URLs: ${track.id}`)
+    continue
+  }
+  if (track.status && track.status !== 'available') errors.push(`Invalid track status: ${track.id}`)
   try {
     const audioPath = join(root, track.audio.replace(/^\//, ''))
     const size = statSync(audioPath).size
@@ -36,6 +45,13 @@ for (const track of tracks) {
       if (eventIds.has(event.id)) errors.push(`Duplicate event: ${event.id}`)
       eventIds.add(event.id)
       if (!validKinds.has(event.kind)) errors.push(`Invalid move: ${event.id}`)
+      const moves = { punch: ['jab', 'cross', 'hook'], kick: ['roundhouse', 'side-kick'], launch: ['uppercut'], finisher: ['spin-kick'] }
+      if (event.move && !moves[event.kind]?.includes(event.move)) errors.push(`Invalid attack variant: ${event.id}`)
+      if (event.technique) {
+        const technique = techniques.find(t => t.id === event.technique)
+        if (!technique || technique.kind !== event.kind) errors.push(`Invalid technique reference: ${event.id}`)
+        usedTechniques.add(event.technique)
+      }
       if (!['enemy-1', 'enemy-2', 'enemy-3'].includes(event.targetId)) errors.push(`Invalid target: ${event.id}`)
       if (!cue.beatsMs.some(beat => Math.abs(beat - event.atMs) <= 1)) errors.push(`Move not on beat: ${event.id}`)
     }
@@ -43,8 +59,9 @@ for (const track of tracks) {
   } catch (error) { errors.push(`Cue map missing or invalid for ${track.id}: ${error.message}`) }
 }
 
+if ([...techniqueIds].some(id => !usedTechniques.has(id))) errors.push('Every technique must appear in the playable cue maps.')
 if (errors.length) {
   for (const error of errors) console.error('✗', error)
   process.exit(1)
 }
-console.log(`✓ Validated ${tracks.length} original tracks, audio files, and beat maps.`)
+console.log(`✓ Validated ${tracks.filter(t => t.status !== 'audio-required').length} playable tracks and ${tracks.filter(t => t.status === 'audio-required').length} requested entries.`)

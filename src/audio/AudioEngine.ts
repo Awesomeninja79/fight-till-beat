@@ -80,6 +80,23 @@ export class AudioEngine {
       const at = this.startedAt + event.atMs / 1000 - this.offset
       if (at < context.currentTime + 0.015) continue
       const heavy = event.kind === 'kick' || event.kind === 'finisher'
+      const swooshAt = at - 0.13
+      if (swooshAt > context.currentTime + 0.015) {
+        const swoosh = context.createBufferSource()
+        const air = context.createBiquadFilter()
+        const envelope = context.createGain()
+        swoosh.buffer = this.noiseBuffer
+        air.type = 'bandpass'
+        air.frequency.setValueAtTime(heavy ? 650 : 1100, swooshAt)
+        air.frequency.exponentialRampToValueAtTime(3400, at)
+        air.Q.value = 0.7
+        envelope.gain.setValueAtTime(0.0001, swooshAt)
+        envelope.gain.exponentialRampToValueAtTime(heavy ? 0.075 : 0.045, at - 0.025)
+        envelope.gain.exponentialRampToValueAtTime(0.0001, at)
+        swoosh.connect(air).connect(envelope).connect(this.effectsGain)
+        swoosh.start(swooshAt); swoosh.stop(at)
+        this.effectSources.push(swoosh)
+      }
       const duration = event.kind === 'finisher' ? 0.24 : heavy ? 0.17 : 0.12
       const osc = context.createOscillator()
       const body = context.createGain()

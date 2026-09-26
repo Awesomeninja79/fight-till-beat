@@ -1,8 +1,10 @@
 # Fight Till Beat
 
-Playable development build for a browser based 3D music-fighting experience. Three original code-generated demo tracks, a procedural disco arena, automatic choreography, controls, and browser checks are implemented locally. The [public GitHub repository](https://github.com/Awesomeninja79/fight-till-beat) has `main` as its default branch and `dev` for ongoing work. The [Vercel project](https://vercel.com/nsrathore7912-4985s-projects/fight-till-beat) deploys protected previews from `dev`; [the current preview](https://fight-till-beat-git-dev-nsrathore7912-4985s-projects.vercel.app/) requires Vercel sign-in. Production builds are skipped while release gates remain open. **No public game deployment exists yet; rights, privacy contact, and release review remain open.**
+Playable development build for a browser based 3D music-fighting experience. Three original code-generated demo tracks, a procedural disco arena, skinned humanoid fighters, anime-style skeletal combat, cinematic camera shots, automatic choreography, controls, and browser checks are implemented locally. The character upgrade uses Quaternius CC0 assets; operator release review remains pending. The [public GitHub repository](https://github.com/Awesomeninja79/fight-till-beat) has `main` as its default branch and `dev` for ongoing work. The [Vercel project](https://vercel.com/nsrathore7912-4985s-projects/fight-till-beat) deploys protected previews from `dev`; [the current preview](https://fight-till-beat-git-dev-nsrathore7912-4985s-projects.vercel.app/) requires Vercel sign-in. Production builds are skipped while release gates remain open. **No public game deployment exists yet; rights, privacy contact, and release review remain open.**
 
 Run locally after `pnpm install` with `pnpm dev`. Run logic/content/build checks with `pnpm check`; run browser flows with `pnpm test:e2e`.
+
+Latest local revision: 50 named, parameterized fighting techniques, blended recovery and two-bone limb solving; human DJ and cheering audience; a move book and technique HUD. Three original songs remain playable. Lean On is a requested, non-playable entry awaiting the authorized recording. No remote music library is connected.
 
 Future project work follows the documentation upkeep rule in [AGENTS.md](AGENTS.md).
 

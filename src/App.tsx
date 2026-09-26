@@ -1,10 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AudioEngine } from './audio/AudioEngine'
 import { comboAt, validateCueMap } from './game/timeline'
+import { combatAt } from './game/combat'
+import { TECHNIQUES, techniqueFor } from './game/techniques'
 import ClubScene from './scene/ClubScene'
-import type { CueMap, Phase, Quality, Track } from './types'
+import { loadFighterAssets, type FighterAssets } from './scene/fighterAssets'
+import { isPlayableTrack, type CatalogTrack, type CueMap, type Phase, type Quality, type Track } from './types'
 
-type InfoPanel = 'help' | 'credits' | 'privacy' | null
+type InfoPanel = 'help' | 'credits' | 'privacy' | 'moves' | null
 
 const SETTINGS_KEY = 'ftb-settings-v1'
 
@@ -41,7 +44,9 @@ function Waveform({ seed, active = false }: { seed: number; active?: boolean }) 
 
 export default function App() {
   const engine = useMemo(() => new AudioEngine(), [])
-  const [tracks, setTracks] = useState<Track[]>([])
+  const [fighterAssets, setFighterAssets] = useState<FighterAssets | null>(null)
+  useEffect(() => { let alive = true; loadFighterAssets().then(assets => { if (alive) setFighterAssets(assets) }).catch(() => { /* Start retries and reports failures. */ }); return () => { alive = false } }, [])
+  const [tracks, setTracks] = useState<CatalogTrack[]>([])
   const [selectedId, setSelectedId] = useState('')
   const [previewId, setPreviewId] = useState<string | null>(null)
   const [phase, setPhase] = useState<Phase>('menu')
@@ -53,7 +58,8 @@ export default function App() {
   const [settings, setSettings] = useState(readSettings)
   const [webglOk, setWebglOk] = useState(true)
   const phaseRef = useRef(phase)
-  const selected = tracks.find(t => t.id === selectedId) ?? tracks[0] ?? null
+  const playableTracks = tracks.filter(isPlayableTrack)
+  const selected = playableTracks.find(t => t.id === selectedId) ?? playableTracks[0] ?? null
 
   useEffect(() => { phaseRef.current = phase }, [phase])
 
@@ -66,11 +72,11 @@ export default function App() {
     fetch('/content/tracks.json', { signal: controller.signal })
       .then(response => {
         if (!response.ok) throw new Error('Track catalog could not be loaded.')
-        return response.json() as Promise<Track[]>
+        return response.json() as Promise<CatalogTrack[]>
       })
       .then(data => {
         setTracks(data)
-        setSelectedId(data[0]?.id ?? '')
+        setSelectedId(data.find(isPlayableTrack)?.id ?? '')
       })
       .catch(reason => {
         if (controller.signal.aborted) return
@@ -134,7 +140,8 @@ export default function App() {
     setPhase('loading')
     try {
       await engine.unlock()
-      const response = await fetch(selected.cues)
+      const [response, assets] = await Promise.all([fetch(selected.cues), loadFighterAssets()])
+      setFighterAssets(assets)
       if (!response.ok) throw new Error('Fight cues could not be loaded.')
       const map = validateCueMap(await response.json(), selected.id)
       await engine.play(selected.audio, 0, () => { setSongTime(selected.durationSec); setPhase('finished') })
@@ -194,11 +201,12 @@ export default function App() {
   const inFight = phase === 'playing' || phase === 'paused' || phase === 'finished'
   const progress = selected ? Math.min(100, (songTime / selected.durationSec) * 100) : 0
   const combo = cues ? comboAt(cues.events, songTime * 1000) : 0
+  const currentTechnique = techniqueFor(combatAt(cues?.events ?? [], songTime * 1000).event)
 
   return (
     <div className="app" style={{ '--accent': selected?.colors[0] ?? '#ff4ac6', '--accent-secondary': selected?.colors[1] ?? '#7c5cff' } as React.CSSProperties}>
-      {webglOk && <ClubScene engine={engine} phase={phase} track={selected} cues={cues} reducedMotion={settings.reducedMotion} reducedFlash={settings.reducedFlash} quality={settings.quality} />}
-      <div className="atmosphere" aria-hidden="true" />
+      {webglOk && <ClubScene assets={fighterAssets} engine={engine} phase={phase} track={selected} cues={cues} reducedMotion={settings.reducedMotion} reducedFlash={settings.reducedFlash} quality={settings.quality} />}
+      <div className={`atmosphere ${inFight ? 'atmosphere-fight' : ''}`} aria-hidden="true" />
       <div className="scanlines" aria-hidden="true" />
 
       <header className="topbar">
@@ -219,7 +227,7 @@ export default function App() {
             <div className="eyebrow"><span className="live-dot" /> THE ARENA IS LIVE <span className="eyebrow-line" /></div>
             <h1>EVERY BEAT<br /><em>HITS HARDER.</em></h1>
             <p>Pick your track. The music takes control. Watch our hero turn every drop into a knockout on the neon dance floor.</p>
-            <div className="hero-tags"><span>3 ORIGINAL TRACKS</span><span>AUTO-CHOREOGRAPHED COMBAT</span><span>3D DISCO ARENA</span></div>
+            <div className="hero-tags"><span>3 ORIGINAL TRACKS</span><span>{TECHNIQUES.length} FIGHT TECHNIQUES</span><span>3D DISCO ARENA</span></div>
           </section>
 
           <section className="track-panel" aria-label="Choose your music">
@@ -229,6 +237,11 @@ export default function App() {
             {tracks.length === 0 && phase !== 'error' && <p className="load-note">Loading original tracks…</p>}
             <div className="track-list">
               {tracks.map((track, index) => {
+                if (!isPlayableTrack(track)) return <article key={track.id} className="track-card track-unavailable" style={{ '--track-color': track.colors[0] } as React.CSSProperties}>
+                  <span className="track-number">{String(index + 1).padStart(2, '0')}</span>
+                  <div className="track-info"><strong>{track.title}</strong><small>{track.artist}</small><p>{track.availabilityNote}</p></div>
+                  <span className="availability-badge">AUDIO REQUIRED</span>
+                </article>
                 const isSelected = selected?.id === track.id
                 const isPreviewing = previewId === track.id
                 return (
@@ -264,10 +277,11 @@ export default function App() {
             <div className="fight-controls">
               <button onClick={() => setSettings(s => ({ ...s, muted: !s.muted }))} aria-label={settings.muted ? 'Unmute' : 'Mute'}>{settings.muted ? 'MUTED' : 'SOUND ON'}</button>
               <button onClick={() => setShowSettings(v => !v)} aria-label="Settings">SETTINGS</button>
+              <button onClick={() => { pause(); setPanel('moves') }}>50 TECHNIQUES</button>
               <button onClick={backToMenu} aria-label="Choose another track">CHANGE TRACK ↗</button>
             </div>
           </div>
-          <div className="fight-side"><span className="fight-label">STYLE METER</span><strong>{String(combo).padStart(2, '0')}<small> HIT COMBO</small></strong><span className="fight-side-rule" /><p>THE FLOOR<br />IS YOURS.</p></div>
+          <div className="fight-side"><span className="fight-label">STYLE METER</span><strong>{String(combo).padStart(2, '0')}<small> HIT COMBO</small></strong><span className="fight-side-rule" /><p className="technique-label"><small>{currentTechnique?.discipline ?? 'FIGHT TILL BEAT'}</small>{currentTechnique?.name ?? 'Find your rhythm.'}</p></div>
           <div className="transport">
             <button className="transport-play" onClick={() => phase === 'playing' ? pause() : void resume()} aria-label={phase === 'playing' ? 'Pause fight' : 'Resume fight'}>{phase === 'playing' ? 'Ⅱ' : '▶'}</button>
             <span className="transport-time">{formatTime(songTime)}</span>
@@ -292,7 +306,8 @@ export default function App() {
       {panel && <div className="modal-backdrop" onClick={() => setPanel(null)}><div className="info-modal" role="dialog" aria-modal="true" aria-label={panel} onClick={e => e.stopPropagation()}>
         <button className="modal-close" onClick={() => setPanel(null)} aria-label="Close">×</button>
         {panel === 'help' && <><span className="modal-kicker">THE RULES OF THE FLOOR</span><h2>LET THE MUSIC FIGHT.</h2><p>Choose an original track, then hit Start Fight. Your hero battles automatically in time with the music. Use Pause, volume, and the settings panel whenever you like.</p><p>The light show is designed to avoid rapid full-screen flashes. Reduced Flash and Reduced Motion are available in Settings. Press Space to pause or resume when the page itself has focus.</p></>}
-        {panel === 'credits' && <><span className="modal-kicker">CREDITS</span><h2>MADE FOR THE BEAT.</h2><p>Original demo music, code-generated effects, characters, and venue were created for Fight Till Beat. Final public credits and rights review will be completed before production release.</p><ul>{tracks.map(track => <li key={track.id}>{track.title} — {track.artist}</li>)}</ul></>}
+        {panel === 'moves' && <><span className="modal-kicker">THE MOVE BOOK</span><h2>50 WAYS TO FIGHT.</h2><p>Stylized game choreography across martial arts and fictional jutsu. Each song combines a different sequence of techniques.</p><ol className="move-book">{TECHNIQUES.map(technique => <li key={technique.id}><strong>{technique.name}</strong><small>{technique.discipline}</small></li>)}</ol></>}
+        {panel === 'credits' && <><span className="modal-kicker">CREDITS</span><h2>MADE FOR THE BEAT.</h2><p>Original demo music, effects, and venue were created for Fight Till Beat. Human fighters, DJ, and audience use Quaternius Universal Base Characters; animation sources are Universal Animation Library and Universal Animation Library 2 (CC0). The 50 stylized techniques combine these clips with project-authored limb targets, timing, throws, and fictional jutsu. Hair, clothing, cheering, cinematic direction, and beat choreography are project adaptations. Final rights review remains open.</p><ul>{tracks.map(track => <li key={track.id}>{track.title} — {track.artist}{!isPlayableTrack(track) ? ' · requested, audio not included' : ''}</li>)}</ul></>}
         {panel === 'privacy' && <><span className="modal-kicker">PRIVACY PREVIEW</span><h2>YOUR SET, YOUR SPACE.</h2><p>This preview is operated by Neeraj Saini. It has no account, ads, or analytics. It stores only your volume, quality, and motion/flash preferences in your browser. Reset them in Settings.</p><p>The hosting provider may process request information such as IP address for delivery and security. A business contact address and full public privacy notice will be completed before production release.</p></>}
       </div></div>}
 

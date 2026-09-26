@@ -43,5 +43,15 @@
     "audio": "/audio/laser-rush.wav",
     "cues": "/content/laser-rush.json",
     "rightsId": "MUSIC-003"
+  },
+  {
+    "id": "lean-on",
+    "title": "Lean On",
+    "artist": "Major Lazer & DJ Snake feat. MØ",
+    "status": "audio-required",
+    "mood": "REQUESTED TRACK",
+    "colors": ["#ffd477", "#ec6b9b"],
+    "rightsId": "MUSIC-004",
+    "availabilityNote": "Requested · waiting for the authorized audio file."
   }
 ]
