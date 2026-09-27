@@ -6,7 +6,6 @@ const previewUrl = `http://127.0.0.1:${previewPort}`
 export default defineConfig({
   testDir: './tests',
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
   use: { baseURL: previewUrl, trace: 'on-first-retry' },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'], channel: process.env.CI ? undefined : 'chrome' } },

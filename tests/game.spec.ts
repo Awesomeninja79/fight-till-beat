@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 test('search and language filters preserve unavailable songs and prevent hidden selection playback', async ({ page }) => {
+  test.slow() // Multiple catalog reflows plus a full-page GPU screenshot exceed 30 seconds on CI runners.
   await page.goto('/')
   await expect(page.getByRole('button', { name: 'Select Neon Strike' })).toBeVisible()
   await page.getByLabel('SEARCH MUSIC').fill('after hours')
