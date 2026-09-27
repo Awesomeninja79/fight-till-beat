@@ -260,7 +260,7 @@ export default function App() {
             <p className="panel-subtitle">Your soundtrack writes the fight.</p>
             <div className="catalog-controls">
               <label>SEARCH MUSIC<input type="search" placeholder="Song, artist, or mood" value={search} onChange={e => { stopPreview(); setSearch(e.target.value) }} /></label>
-              <label>LANGUAGE<select value={language} onChange={e => { stopPreview(); setLanguage(e.target.value as MusicLanguage | 'all') }}><option value="all">All languages</option>{Object.entries(LANGUAGE_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+              <label>LANGUAGE<select aria-label="LANGUAGE" value={language} onChange={e => { stopPreview(); setLanguage(e.target.value as MusicLanguage | 'all') }}><option value="all">All languages</option>{Object.entries(LANGUAGE_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
             </div>
             <p className="catalog-count" role="status">{visibleTracks.length} {visibleTracks.length === 1 ? 'track' : 'tracks'} · {visibleTracks.filter(isPlayableTrack).length} playable</p>
             {tracks.length === 0 && phase !== 'error' && <p className="load-note">Loading original tracks…</p>}
