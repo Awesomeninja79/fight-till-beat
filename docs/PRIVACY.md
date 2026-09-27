@@ -15,6 +15,8 @@ The app will not claim “no data is collected.” Vercel describes request and 
 
 ## Controls and documentation
 
+Catalog search text and language selection are held only in page memory. They are neither added to localStorage nor sent to a provider, URL, or server. Existing preferences remain the only persisted app settings. Audio previews still fetch only same-origin catalog recordings.
+
 - The individual operator is Neeraj Saini; launch is intended worldwide. A business contact address is pending, and no personal email should be published. Before launch, identify the contact, hosting account, processor relationship, log/retention settings, and where data may be handled. Draft the privacy notice from the observed production network/storage audit, not from assumptions.
 - The Vercel project-level option to improve models with this project's code/chat data was turned off during setup. Confirm the saved setting during release review; this does not replace the public privacy notice.
 - Do not set a tracking cookie or persistent identifier. If local preferences persist, say what keys exist and provide Reset Preferences. Do not put personal data in URL query strings.
@@ -24,5 +26,7 @@ The app will not claim “no data is collected.” Vercel describes request and 
 - Revisit this document before introducing uploads, accounts, payments, social sharing, analytics, AI APIs, or a large catalog admin service.
 
 ## Privacy gate
+
+Offline music authoring processes operator-supplied files locally with Node and writes draft JSON locally; it sends no recording to an external service. `.music-work/` is git-ignored, not encrypted or access-controlled. Keep recordings/evidence in suitable private storage. Approved cue metadata may become public: use a non-sensitive reviewer identifier and keep permission evidence and personal contacts out of exported JSON. Visitor data flows remain as above.
 
 No release until an operator-approved notice and contact are live, dashboard settings and retention are documented, the deployed Network/Storage panels match the data map, and any applicable regional review has been completed. Exact legal language remains an owner/counsel decision.

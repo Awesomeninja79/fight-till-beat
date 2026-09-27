@@ -15,6 +15,7 @@ export class AudioEngine {
   private effectsVolume = 0.55
   private muted = false
   private ended: (() => void) | null = null
+  private playbackRequest = 0
 
   private async ensureContext() {
     if (!this.context) {
@@ -139,9 +140,11 @@ export class AudioEngine {
   }
 
   async play(url: string, offset = 0, onEnded?: () => void) {
+    this.stop()
+    const request = this.playbackRequest
     const context = await this.ensureContext()
     const buffer = await this.load(url)
-    this.stop()
+    if (request !== this.playbackRequest) return false
     const source = context.createBufferSource()
     source.buffer = buffer
     source.connect(this.gain!)
@@ -157,6 +160,7 @@ export class AudioEngine {
       this.ended?.()
     }
     source.start(this.startedAt, offset)
+    return true
   }
 
   pause() {
@@ -169,11 +173,12 @@ export class AudioEngine {
   }
 
   async resume(onEnded?: () => void) {
-    if (!this.activeUrl) return
-    await this.play(this.activeUrl, this.offset, onEnded)
+    if (!this.activeUrl) return false
+    return this.play(this.activeUrl, this.offset, onEnded)
   }
 
   stop() {
+    this.playbackRequest++
     this.stopEffects()
     if (this.source) {
       const source = this.source
@@ -187,7 +192,7 @@ export class AudioEngine {
 
   getTime() {
     if (!this.source || !this.context) return this.offset
-    return Math.max(0, this.offset + this.context.currentTime - this.startedAt)
+    return this.offset + Math.max(0, this.context.currentTime - this.startedAt)
   }
 
   dispose() {

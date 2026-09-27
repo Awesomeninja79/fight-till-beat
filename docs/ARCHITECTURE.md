@@ -17,6 +17,8 @@ Avoid adding state libraries, physics engines, a backend, or live beat-analysis 
 
 ## Runtime boundary
 
+Music authoring now has a separate offline Node boundary: private PCM WAV → chunk-aware decoding/energy analysis → candidate beats or corrected timestamp input → hash-bound draft cues → human timing/rights approval → catalog validation → normal static release. No package or runtime network destination was added. The content validator imports `scripts/music-pipeline.mjs` to check exact audio hashes and review/language metadata on new tracks. It permits catalog growth beyond the three original demos. Runtime playback still samples the existing cue schema from the Web Audio clock.
+
 ```text
 Track picker (React/HTML) → selection → load only chosen track + cue map
 Start click → AudioContext unlock → scheduled song start
@@ -51,6 +53,8 @@ tests/             browser journeys and fixtures
 The current music generator source is `scripts/generate-music.py`; it imports no audio samples. Future authoring sources such as `.blend`, DAW sessions, contracts, and high resolution originals must live in private or appropriately access-controlled storage. The public build receives only approved exports and required public credits. No secrets are placed in the frontend bundle.
 
 ## Configuration and failure behavior
+
+Local discovery uses `src/game/catalog.ts` for Unicode-normalized word matching and language filtering. Search state stays in React memory. The App prevents launching a selection outside the visible results and tracks transport request generations; AudioEngine independently cancels stale asynchronous starts. The original three manifest entries now declare `instrumental`, and the requested Lean On entry declares `en`. No backend or external music network call was added.
 
 Validate manifest/cue schema at build time and runtime. A bad track is disabled with a descriptive error; it must not crash the picker. Use a build-time generated track allowlist so a rights-affected track can be removed and redeployed without changing core logic. Catch asset load/decode failures with retry or change-track actions. WebGL context loss pauses audio and shows recovery. Browser visibility changes pause or explicitly reconcile song position according to the transport policy in [audio plan](AUDIO_AND_CHOREOGRAPHY.md).
 

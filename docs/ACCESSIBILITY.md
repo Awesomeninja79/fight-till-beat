@@ -1,5 +1,7 @@
 # Accessibility and motion safety
 
+Music catalog controls use visible Search Music/Language labels, native keyboard-operable search/select elements, existing focus outlines, and a polite result-count status. Empty results offer Clear Filters; Start is disabled when the selected track is outside the results. The controls stack on narrow screens. Desktop/mobile browser flows cover discovery and horizontal overflow; screen-reader usability and full contrast audits remain manual gates.
+
 ## Target and design
 
 Aim for WCAG 2.2 AA on the HTML controls, text, and navigation, with equivalent control over the WebGL experience where practical. The game is visual, but track selection, playback, pause, volume, settings, help, credits, and errors must remain operable outside the canvas.

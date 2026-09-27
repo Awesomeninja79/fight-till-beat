@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "typecheck": "tsc -b",
-    "test": "vitest run",
+    "test": "vitest run && node --test scripts/music-pipeline.test.mjs",
+    "music:analyze": "node scripts/music-pipeline.mjs",
     "test:e2e": "playwright test",
     "validate:content": "node scripts/validate-content.mjs",
     "check": "pnpm typecheck && pnpm test && pnpm validate:content && pnpm build"

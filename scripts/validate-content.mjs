@@ -1,5 +1,6 @@
 import { readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
+import { decodeWav, validateMusicReview } from './music-pipeline.mjs'
 
 const root = new URL('../public/', import.meta.url).pathname.replace(/^\/(?:([A-Za-z]):\/)/, '$1:/')
 const readJson = path => JSON.parse(readFileSync(join(root, path), 'utf8'))
@@ -11,7 +12,8 @@ const techniqueIds = new Set(techniques.map(t => t.id))
 const usedTechniques = new Set()
 if (techniques.length < 50 || techniqueIds.size !== techniques.length) errors.push('At least 50 uniquely identified techniques are required.')
 
-if (!Array.isArray(tracks) || tracks.filter(t => t.status !== 'audio-required').length !== 3) errors.push('Preview catalog must contain three playable originals.')
+const originals = new Set(['neon-strike', 'after-hours', 'laser-rush'])
+if (!Array.isArray(tracks) || ![...originals].every(id => tracks.some(t => t.id === id && t.status !== 'audio-required'))) errors.push('Catalog must retain the three playable originals.')
 const ids = new Set()
 for (const track of tracks) {
   if (ids.has(track.id)) errors.push(`Duplicate track ID: ${track.id}`)
@@ -27,21 +29,22 @@ for (const track of tracks) {
     const audioPath = join(root, track.audio.replace(/^\//, ''))
     const size = statSync(audioPath).size
     if (size > 6_000_000) errors.push(`Audio exceeds 6 MB: ${track.id}`)
-    const header = readFileSync(audioPath).subarray(0, 44)
-    if (header.toString('ascii', 0, 4) !== 'RIFF' || header.toString('ascii', 8, 12) !== 'WAVE') errors.push(`Invalid WAV: ${track.id}`)
-    const sampleRate = header.readUInt32LE(24)
-    const bytesPerSecond = header.readUInt32LE(28)
-    const duration = (size - 44) / bytesPerSecond
+    const { sampleRate, durationMs } = decodeWav(readFileSync(audioPath))
+    const duration = durationMs / 1000
     if (sampleRate !== 32000 || Math.abs(duration - track.durationSec) > 0.1) errors.push(`Audio duration mismatch: ${track.id}`)
   } catch (error) { errors.push(`Audio file missing or invalid for ${track.id}: ${error.message}`) }
   try {
     const cue = readJson(track.cues.replace(/^\//, ''))
+    if (!originals.has(track.id) || cue.audioSha256 || cue.review) validateMusicReview(track, cue, readFileSync(join(root, track.audio.replace(/^\//, ''))))
     if (cue.schemaVersion !== 1 || cue.trackId !== track.id) errors.push(`Cue version/ID mismatch for ${track.id}`)
     if (Math.abs(cue.durationMs / 1000 - track.durationSec) > 0.1) errors.push(`Cue duration mismatch for ${track.id}`)
     if (!Array.isArray(cue.beatsMs) || cue.beatsMs.length < 64) errors.push(`Too few beats for ${track.id}`)
     if (!cue.beatsMs.every((time, i) => i === 0 || time > cue.beatsMs[i - 1])) errors.push(`Unsorted beats for ${track.id}`)
     const eventIds = new Set()
+    let previousEvent = -1
     for (const event of cue.events ?? []) {
+      if (!Number.isInteger(event.atMs) || event.atMs < 0 || event.atMs >= cue.durationMs || event.atMs <= previousEvent || event.actorId !== 'hero') errors.push(`Invalid event timing/actor: ${event.id}`)
+      previousEvent = event.atMs
       if (eventIds.has(event.id)) errors.push(`Duplicate event: ${event.id}`)
       eventIds.add(event.id)
       if (!validKinds.has(event.kind)) errors.push(`Invalid move: ${event.id}`)

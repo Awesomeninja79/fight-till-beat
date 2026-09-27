@@ -1,5 +1,28 @@
 import { expect, test } from '@playwright/test'
 
+test('search and language filters preserve unavailable songs and prevent hidden selection playback', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.getByRole('button', { name: 'Select Neon Strike' })).toBeVisible()
+  await page.getByLabel('SEARCH MUSIC').fill('after hours')
+  await expect(page.locator('.track-card')).toHaveCount(1)
+  await expect(page.getByRole('button', { name: 'START THE FIGHT' })).toBeDisabled()
+  await page.getByRole('button', { name: 'Select After Hours' }).click()
+  await expect(page.getByRole('button', { name: 'START THE FIGHT' })).toBeEnabled()
+  await page.getByLabel('SEARCH MUSIC').fill('')
+  await page.getByLabel('LANGUAGE', { exact: true }).selectOption('hi')
+  await expect(page.getByText('No matching tracks yet.')).toBeVisible()
+  await expect(page.getByRole('button', { name: 'START THE FIGHT' })).toBeDisabled()
+  await page.getByLabel('LANGUAGE', { exact: true }).selectOption('en')
+  await expect(page.locator('.track-card')).toHaveCount(1)
+  await expect(page.locator('.track-card')).toContainText('Lean On')
+  await expect(page.locator('.track-card button')).toHaveCount(0)
+  await page.getByLabel('SEARCH MUSIC').fill('not in catalog')
+  await page.getByRole('button', { name: 'CLEAR FILTERS' }).click()
+  await expect(page.locator('.track-card')).toHaveCount(4)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+  await page.screenshot({ path: test.info().outputPath('music-catalog.png'), fullPage: true })
+})
+
 test('choose a song, enter the arena, pause, and return to the track list', async ({ page }) => {
   test.slow() // Includes two GPU screenshots; transport assertions keep their own timeouts.
   await page.goto('/')

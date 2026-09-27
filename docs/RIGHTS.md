@@ -24,4 +24,6 @@ Preferred acquisition is original commissioned music with signed contributor agr
 
 ## Publishing gate
 
+The offline analyzer always writes `review.status: draft` and false timing/rights approvals. New playable catalog IDs fail content validation without a matching audio SHA-256, language, approved review flags, reviewer identifier, and review date. These fields record reviewer attestations; code does not authenticate the reviewer or inspect private contracts. Human asset-register/evidence review remains mandatory. No new production asset or license has been acquired through the English/Hindi pipeline change, so the asset register and public credits are unchanged.
+
 The release manifest contains only rights IDs in Cleared status. CI checks that each referenced asset maps to a valid rights ID; human review verifies actual evidence and contract scope. The catalog expansion service must automatically unpublish expired or withdrawn songs. Evidence files stay in private storage and are never bundled with the game.

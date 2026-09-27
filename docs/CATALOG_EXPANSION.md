@@ -2,6 +2,12 @@
 
 ## Two catalog sizes
 
+2026-09-26 approved direction: grow a small cleared English/Hindi catalog first. Offline draft generation and manual timestamp correction are now implemented through `pnpm music:analyze`; see [content pipeline](CONTENT_PIPELINE.md). Catalog validation permits additional reviewed tracks while retaining the original demos. Language is metadata, not a separate beat detector. New entries require recording hashes and human timing/rights attestations. Local catalog search and language filters are implemented; a provider connection, new recordings, and purchases remain pending.
+
+Jamendo Licensing and Universal Production Music are candidates to investigate for game-use agreements; specific English/Hindi vocal availability, interactive use, worldwide delivery, and pricing remain unverified. No provider is selected. The current detector is a dependency-free constant-tempo energy-grid prototype. It cannot guarantee arbitrary-song beat accuracy; manual timestamp correction supports tempo changes. Draft choreography now responds to relative beat energy (rests, dodges, attacks). Musical section recognition and a more capable offline detector remain future improvements.
+
+Search matches all entered words against title, artist, mood, and the language label using Unicode normalization and case-insensitive comparison, entirely in memory. English, Hindi, Instrumental, and Other filters intersect with search. Requested tracks remain unavailable in results. A hidden selection cannot start playback; the visitor selects a visible playable result or clears filters. No matching Hindi songs displays an honest empty state. Current originals are tagged Instrumental; Lean On is English and still audio-required. Search/filter values are not stored or sent to a server.
+
 **V1 curated catalog:** three to a few dozen songs whose rights and cue maps are reviewed manually. Static JSON and same-origin files remain simple, cheap to operate, and privacy-light. Search/filter UI can work on the local manifest.
 
 **Large managed catalog:** if songs are added regularly or the list becomes too large to ship as one manifest, add an authenticated internal publishing service, relational catalog database, object storage/CDN for audio and artwork, background analysis worker, and paginated public catalog API. Visitors still do not need accounts. This is a later architecture milestone, not a dependency of the first release.

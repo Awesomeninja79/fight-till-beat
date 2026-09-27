@@ -10,6 +10,8 @@ const motifs = [
   [['punch', 'hook'], ['kick', 'roundhouse'], ['step'], ['step']],
 ]
 for (const [trackIndex, track] of tracks.filter(t => t.status !== 'audio-required').entries()) {
+  // Imported maps belong to the analysis/review pipeline, not demo regeneration.
+  if (!['neon-strike', 'after-hours', 'laser-rush'].includes(track.id)) continue
   const file = new URL(`${track.id}.json`, root)
   const cue = JSON.parse(readFileSync(file, 'utf8'))
   const bars = cue.beatsMs.length / 4

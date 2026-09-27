@@ -1,4 +1,6 @@
+export type MusicLanguage = 'en' | 'hi' | 'instrumental' | 'other'
 export type Track = {
+  language?: MusicLanguage
   status?: 'available'
   id: string
   title: string
@@ -13,6 +15,7 @@ export type Track = {
 }
 
 export type RequestedTrack = {
+  language?: MusicLanguage
   id: string
   title: string
   artist: string
