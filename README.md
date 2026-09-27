@@ -1,5 +1,7 @@
 # Fight Till Beat
 
+Jamendo now supports 500 ms debounced search, shared track selection, Preview and Start with automatically estimated beat/fight timing. Artist/provider/license links are retained; the blanket runtime preparation restriction is removed at the owner’s request. Three originals remain the default catalog. See [Jamendo playback, setup and limits](docs/JAMENDO.md). Configuration is local; rights, release and measured timing reviews remain open.
+
 Playable development build for a browser based 3D music-fighting experience. Three original code-generated demo tracks, a procedural disco arena, skinned humanoid fighters, anime-style skeletal combat, cinematic camera shots, automatic choreography, controls, and browser checks are implemented locally. The character upgrade uses Quaternius CC0 assets; operator release review remains pending. The [public GitHub repository](https://github.com/Awesomeninja79/fight-till-beat) has `main` as its default branch and `dev` for ongoing work. The [public game](https://project-3te70.vercel.app/) is live on Vercel, with anonymous access and basic gameplay verified. Production deployment `dpl_AVTMY3GND6iBiRs8dbrEQkbxyrX6` uses commit `3dda054`. The owner authorized this public release; rights/operator review, privacy contact, accessibility, real-device performance, and full-track timing review remain open.
 
 Run locally after `pnpm install` with `pnpm dev`. Run logic/content/build checks with `pnpm check`; run browser flows with `pnpm test:e2e`.
@@ -8,7 +10,7 @@ Music authoring: `pnpm music:analyze <recording.wav> <track-id> <en|hi|instrumen
 
 Local music continuation adds title/artist/mood search, English/Hindi/Instrumental/Other filters, clear unavailable/empty states, and protection against overlapping preview requests. Draft fight generation now adapts rests/dodges/attacks to relative beat energy. Existing audio and authored demo cue maps are unchanged.
 
-Latest local revision: 50 named, parameterized fighting techniques, blended recovery and two-bone limb solving; human DJ and cheering audience; a move book and technique HUD. Three original songs remain playable. Lean On is a requested, non-playable entry awaiting the authorized recording. No remote music library is connected.
+Latest local revision: 50 named, parameterized fighting techniques, blended recovery and two-bone limb solving; human DJ and cheering audience; a move book and technique HUD. Three original songs remain playable. The unavailable Lean On placeholder was removed at the owner’s request. The shared search now includes Jamendo metadata results.
 
 Future project work follows the documentation upkeep rule in [AGENTS.md](AGENTS.md).
 

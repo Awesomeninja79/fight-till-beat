@@ -1,5 +1,9 @@
 # Hosting and deployment plan
 
+Playback addition remains local/unreleased. Before deployment, verify metadata endpoint configuration, browser CORS/media requests to Jamendo storage, and any enforced CSP connect-src allowance for approved stream hosts. Direct audio playback and automatic cues now require their own preview smoke test; deployment does not establish per-recording rights or audible timing approval.
+
+Jamendo deployment addition: configure server-only `JAMENDO_CLIENT_ID` in the target Vercel environment and deploy `api/jamendo.ts` with the frontend. Local Vite uses the same handler; static-only hosting and `vite preview` do not provide this route. Check missing configuration, a real query and rate/provider error states after deployment. This work configures local development only; no cloud variable or public deployment was performed. Provider agreement, privacy/contact and platform-wide quota/abuse review remain gates.
+
 ## Hosting decision
 
 Vercel serves the static Vite build over HTTPS. V1 needs no server functions or database. The Vercel Codex connection is already installed, so no additional Codex plugin is required. A Git repository connected to Vercel can produce preview deployments; a manual CLI deployment is also possible. [Vite on Vercel](https://vercel.com/docs/frameworks/frontend/vite), [deployment methods](https://vercel.com/docs/deployments/overview).

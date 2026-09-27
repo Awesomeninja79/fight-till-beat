@@ -4,9 +4,16 @@ import { comboAt, validateCueMap } from './game/timeline'
 import { combatAt } from './game/combat'
 import { TECHNIQUES, techniqueFor } from './game/techniques'
 import { filterCatalog, LANGUAGE_LABELS } from './game/catalog'
+import { useJamendoSearch, type JamendoTrack } from './audio/useJamendoSearch'
+import TrackCard from './TrackCard'
+import { analyzeAudio } from './audio/beatAnalysis'
 import ClubScene from './scene/ClubScene'
 import { loadFighterAssets, type FighterAssets } from './scene/fighterAssets'
 import { isPlayableTrack, type CatalogTrack, type CueMap, type Phase, type Quality, type Track, type MusicLanguage } from './types'
+
+function gameTrack(track: JamendoTrack): Track {
+  return { id: 'jamendo-' + track.id, title: track.title, artist: track.artist, bpm: 120, durationSec: track.durationSec, mood: 'AUTOMATIC RHYTHM', colors: ['#70deff', '#ff4ac6'], audio: track.audio, cues: '', rightsId: '', provider: { url: track.url, licenseUrl: track.licenseUrl } }
+}
 
 type InfoPanel = 'help' | 'credits' | 'privacy' | 'moves' | null
 
@@ -34,21 +41,16 @@ function formatTime(seconds: number) {
   return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`
 }
 
-function Waveform({ seed, active = false }: { seed: number; active?: boolean }) {
-  return <div className={`waveform ${active ? 'waveform-active' : ''}`} aria-hidden="true">
-    {Array.from({ length: 34 }, (_, i) => {
-      const height = 12 + Math.abs(Math.sin(i * 1.89 + seed) * Math.cos(i * 0.42 + seed)) * 34
-      return <span key={i} style={{ height: `${height}px` }} />
-    })}
-  </div>
-}
-
 export default function App() {
   const engine = useMemo(() => new AudioEngine(), [])
   const [fighterAssets, setFighterAssets] = useState<FighterAssets | null>(null)
   useEffect(() => { let alive = true; loadFighterAssets().then(assets => { if (alive) setFighterAssets(assets) }).catch(() => { /* Start retries and reports failures. */ }); return () => { alive = false } }, [])
   const [tracks, setTracks] = useState<CatalogTrack[]>([])
   const [search, setSearch] = useState('')
+  const [selectedRemote, setSelectedRemote] = useState<JamendoTrack | null>(null)
+  const [preparedTrack, setPreparedTrack] = useState<Track | null>(null)
+  const preparation = useRef<AbortController | null>(null)
+  const [loadingText, setLoadingText] = useState('Preparing the arena…')
   const [language, setLanguage] = useState<MusicLanguage | 'all'>('all')
   const transportRequest = useRef(0)
   const [selectedId, setSelectedId] = useState('')
@@ -63,9 +65,13 @@ export default function App() {
   const [webglOk, setWebglOk] = useState(true)
   const phaseRef = useRef(phase)
   const playableTracks = tracks.filter(isPlayableTrack)
-  const selected = playableTracks.find(t => t.id === selectedId) ?? playableTracks[0] ?? null
+  const remoteTrack = useMemo(() => selectedRemote ? gameTrack(selectedRemote) : null, [selectedRemote])
+  const selected = remoteTrack ? (preparedTrack?.id === remoteTrack.id ? preparedTrack : remoteTrack) : playableTracks.find(t => t.id === selectedId) ?? playableTracks[0] ?? null
   const visibleTracks = filterCatalog(tracks, search, language)
-  const visibleSelection = selected && visibleTracks.some(track => track.id === selected.id)
+  const remoteMusic = useJamendoSearch(search, language, phase === 'menu')
+  const resultCount = visibleTracks.length + remoteMusic.tracks.length
+  const visibleSelection = selectedRemote ? remoteMusic.tracks.some(track => track.id === selectedRemote.id) : selected && visibleTracks.some(track => track.id === selected.id)
+  const playableResults = visibleTracks.filter(isPlayableTrack).length + remoteMusic.tracks.filter(track => Boolean(track.audio)).length
 
   useEffect(() => { phaseRef.current = phase }, [phase])
 
@@ -89,7 +95,7 @@ export default function App() {
         setError(reason instanceof Error ? reason.message : 'Track catalog unavailable.')
         setPhase('error')
       })
-    return () => { controller.abort(); engine.dispose() }
+    return () => { controller.abort(); preparation.current?.abort(); engine.dispose() }
   }, [engine])
 
   useEffect(() => {
@@ -116,6 +122,12 @@ export default function App() {
     const onVisibility = () => {
       if (!document.hidden) return
       pause()
+      if (phaseRef.current === 'loading') {
+        preparation.current?.abort()
+        transportRequest.current++
+        engine.stop()
+        setPhase('menu')
+      }
       if (phaseRef.current === 'menu') {
         transportRequest.current++
         engine.stop()
@@ -127,6 +139,7 @@ export default function App() {
   }, [pause, engine])
 
   const stopPreview = useCallback(() => {
+    preparation.current?.abort()
     transportRequest.current++
     engine.stop()
     setPreviewId(null)
@@ -150,27 +163,44 @@ export default function App() {
   }
 
   const startFight = async () => {
-    if (!selected || !visibleSelection || !webglOk) return
+    if (!selected || (phase === 'menu' && !visibleSelection) || !selected.audio || !webglOk) return
     const request = ++transportRequest.current
     engine.stop()
     setPreviewId(null)
     setSongTime(0)
     setError('')
+    preparation.current?.abort()
+    const controller = new AbortController()
+    preparation.current = controller
+    setLoadingText(selected.provider ? 'Loading your song…' : 'Preparing the arena…')
     setPhase('loading')
     try {
       await engine.unlock()
-      const [response, assets] = await Promise.all([fetch(selected.cues), loadFighterAssets()])
+      const prepare = async () => {
+        if (selected.provider) {
+          if (selected.durationSec > 600) throw Error('Choose a recording under 10 minutes for automatic fights.')
+          const buffer = await engine.load(selected.audio, controller.signal)
+          if (request !== transportRequest.current) throw new DOMException('Canceled', 'AbortError')
+          setLoadingText('Finding the beats and building your fight…')
+          const map = cues?.trackId === selected.id ? cues : await analyzeAudio(buffer, selected.id, controller.signal)
+          return { map: validateCueMap(map, selected.id), track: { ...selected, bpm: map.bpm, durationSec: buffer.duration } }
+        }
+        const response = await fetch(selected.cues, { signal: controller.signal })
+        if (!response.ok) throw new Error('Fight cues could not be loaded.')
+        return { map: validateCueMap(await response.json(), selected.id), track: selected }
+      }
+      const [{ map, track }, assets] = await Promise.all([prepare(), loadFighterAssets()])
       if (request !== transportRequest.current) return
       setFighterAssets(assets)
-      if (!response.ok) throw new Error('Fight cues could not be loaded.')
-      const map = validateCueMap(await response.json(), selected.id)
-      const started = await engine.play(selected.audio, 0, () => { setSongTime(selected.durationSec); setPhase('finished') })
+      if (track.provider) setPreparedTrack(track)
+      const started = await engine.play(track.audio, 0, () => { if (request === transportRequest.current) { setSongTime(track.durationSec); setPhase('finished') } })
       if (!started || request !== transportRequest.current) return
       engine.scheduleFightEffects(map)
       setCues(map)
       setPhase('playing')
     } catch (reason) {
       if (request !== transportRequest.current) return
+      controller.abort()
       engine.stop()
       setError(reason instanceof Error ? reason.message : 'Unable to start the fight.')
       setPhase('error')
@@ -190,8 +220,10 @@ export default function App() {
   }, [engine, cues, selected?.durationSec])
 
   const backToMenu = () => {
+    preparation.current?.abort()
     transportRequest.current++
     engine.stop()
+    setError('')
     setPreviewId(null)
     setSongTime(0)
     setCues(null)
@@ -255,14 +287,14 @@ export default function App() {
           </section>
 
           <section className="track-panel" aria-label="Choose your music">
-            <div className="panel-topline"><span>01 / CHOOSE YOUR SOUND</span><span className="panel-line" /><span>{String(tracks.length).padStart(2, '0')} TRACKS</span></div>
+            <div className="panel-topline"><span>01 / CHOOSE YOUR SOUND</span><span className="panel-line" /><span>{String(resultCount).padStart(2, '0')} TRACKS</span></div>
             <h2>THE TRACKLIST<span className="heading-star">✳</span></h2>
             <p className="panel-subtitle">Your soundtrack writes the fight.</p>
             <div className="catalog-controls">
-              <label>SEARCH MUSIC<input type="search" placeholder="Song, artist, or mood" value={search} onChange={e => { stopPreview(); setSearch(e.target.value) }} /></label>
-              <label>LANGUAGE<select aria-label="LANGUAGE" value={language} onChange={e => { stopPreview(); setLanguage(e.target.value as MusicLanguage | 'all') }}><option value="all">All languages</option>{Object.entries(LANGUAGE_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+              <label>SEARCH MUSIC<input type="search" placeholder="Song, artist, or mood" value={search} onChange={e => { stopPreview(); setSelectedRemote(null); setSearch(e.target.value) }} /></label>
+              <label>LANGUAGE<select aria-label="LANGUAGE" value={language} onChange={e => { stopPreview(); setSelectedRemote(null); setLanguage(e.target.value as MusicLanguage | 'all') }}><option value="all">All languages</option>{Object.entries(LANGUAGE_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
             </div>
-            <p className="catalog-count" role="status">{visibleTracks.length} {visibleTracks.length === 1 ? 'track' : 'tracks'} · {visibleTracks.filter(isPlayableTrack).length} playable</p>
+            <p className="catalog-count" role="status">{resultCount} {resultCount === 1 ? 'track' : 'tracks'} · {playableResults} playable{remoteMusic.pending ? ' · Searching Jamendo…' : ''}</p>
             {tracks.length === 0 && phase !== 'error' && <p className="load-note">Loading original tracks…</p>}
             <div className="track-list">
               {visibleTracks.map((track) => {
@@ -272,24 +304,26 @@ export default function App() {
                   <div className="track-info"><strong>{track.title}</strong><small>{track.artist}</small><p>{track.availabilityNote}</p></div>
                   <span className="availability-badge">AUDIO REQUIRED</span>
                 </article>
-                const isSelected = selected?.id === track.id
+                const isSelected = !selectedRemote && selected?.id === track.id
                 const isPreviewing = previewId === track.id
                 return (
-                  <article key={track.id} className={`track-card ${isSelected ? 'selected' : ''}`} style={{ '--track-color': track.colors[0] } as React.CSSProperties}>
-                    <button className="track-select" onClick={() => { stopPreview(); setSelectedId(track.id) }} aria-label={`Select ${track.title}`} aria-pressed={isSelected}>
-                      <span className="track-number">{String(index + 1).padStart(2, '0')}</span>
-                      <span className="track-info"><strong>{track.title}</strong><small>{track.mood} <b>•</b> {track.bpm} BPM</small><small>{track.language ? LANGUAGE_LABELS[track.language] : 'Language unspecified'}</small></span>
-                      <Waveform seed={index + 2} active={isPreviewing} />
-                      <span className="track-duration">{formatTime(track.durationSec)}</span>
-                    </button>
-                    <button className="preview-button" onClick={() => void preview(track)} aria-label={isPreviewing ? `Stop preview of ${track.title}` : `Preview ${track.title}`} title={isPreviewing ? 'Stop preview' : 'Preview track'}>{isPreviewing ? '■' : '▶'}</button>
-                  </article>
+                  <TrackCard key={track.id} title={track.title} subtitle={`${track.mood} • ${track.bpm} BPM`} detail={track.language ? LANGUAGE_LABELS[track.language] : 'Language unspecified'} durationSec={track.durationSec} index={index} color={track.colors[0]} selected={isSelected} previewing={isPreviewing} onSelect={() => { stopPreview(); setSelectedRemote(null); setSelectedId(track.id) }} action={<button className="preview-button" onClick={() => void preview(track)} aria-label={isPreviewing ? `Stop preview of ${track.title}` : `Preview ${track.title}`} title={isPreviewing ? 'Stop preview' : 'Preview track'}>{isPreviewing ? '■' : '▶'}</button>} />
                 )
               })}
+              {remoteMusic.tracks.map((track, index) => <div key={track.id}>
+                <TrackCard title={track.title} subtitle={track.artist} detail={track.audio ? 'Jamendo · Automatic rhythm' : 'Jamendo · Audio unavailable'} durationSec={track.durationSec} index={visibleTracks.length + index} color="#70deff" provider selected={selectedRemote?.id === track.id} previewing={previewId === 'jamendo-' + track.id} onSelect={() => { stopPreview(); setSelectedRemote(track) }} action={<button className="preview-button" disabled={!track.audio} onClick={() => void preview(gameTrack(track))} aria-label={previewId === 'jamendo-' + track.id ? 'Stop preview of ' + track.title : 'Preview ' + track.title}>{previewId === 'jamendo-' + track.id ? '■' : '▶'}</button>} />
+                <p className="track-attribution"><a href={track.url} target="_blank" rel="noopener noreferrer">{track.artist} · Jamendo</a>{track.licenseUrl && <> · <a href={track.licenseUrl} target="_blank" rel="noopener noreferrer">License</a></>}</p>
+              </div>)}
+
             </div>
-            {visibleTracks.length === 0 && tracks.length > 0 && <div className="catalog-empty"><strong>No matching tracks yet.</strong><p>{language === 'hi' ? 'Hindi songs will appear here once their audio and beat maps are ready.' : 'Try another song, artist, mood, or language.'}</p><button className="text-button" onClick={() => { setSearch(''); setLanguage('all') }}>CLEAR FILTERS</button></div>}
-            {visibleTracks.length > 0 && !visibleSelection && <p className="catalog-count">Select a playable track from these results to start.</p>}
-            <button className="start-button" onClick={() => void startFight()} disabled={!selected || !visibleSelection || !webglOk}>
+            {remoteMusic.error && <p className="inline-error" role="alert">{remoteMusic.error} <button className="text-button" onClick={() => void remoteMusic.search(remoteMusic.nextOffset ?? 0)}>RETRY SEARCH</button></p>}
+            {remoteMusic.nextOffset !== null && !remoteMusic.error && <button className="library-search-button" disabled={remoteMusic.busy} onClick={() => void remoteMusic.search(remoteMusic.nextOffset!)}>MORE RESULTS</button>}
+            {resultCount === 0 && tracks.length > 0 && !remoteMusic.pending && <div className="catalog-empty"><strong>No matching tracks yet.</strong><p>Try another song, artist, mood, or language.</p><button className="text-button" onClick={() => { setSelectedRemote(null); setSearch(''); setLanguage('all') }}>CLEAR FILTERS</button></div>}
+            {(search || language !== 'all') && <button className="text-button" onClick={() => { stopPreview(); setSelectedRemote(null); setSearch(''); setLanguage('all') }}>RESET SEARCH</button>}
+            <p className="catalog-count">Search includes <a href="https://www.jamendo.com/" target="_blank" rel="noopener noreferrer">Jamendo</a> after you pause typing. Select a song and press Start. Its fight is generated automatically from the audio.</p>
+            {resultCount > 0 && !visibleSelection && <p className="catalog-count">Select a playable track from these results to start.</p>}
+            {selectedRemote && <p className="catalog-count">{selectedRemote.audio ? selectedRemote.title + ' is selected. Ready to find its rhythm.' : 'Jamendo has not supplied a playable stream for this song.'}</p>}
+            <button className="start-button" onClick={() => void startFight()} disabled={!selected?.audio || !visibleSelection || !webglOk}>
               <span>START THE FIGHT</span><span className="start-arrow">↗</span>
             </button>
             <div className="start-caption"><span>◈</span> HEADPHONES RECOMMENDED <span className="caption-divider">/</span> PRESS START TO ENABLE SOUND</div>
@@ -299,13 +333,13 @@ export default function App() {
         </main>
       )}
 
-      {phase === 'loading' && <main className="center-overlay" role="status"><div className="loading-orbit">✦</div><span>PREPARING THE ARENA</span><h2>Feel the build-up.</h2></main>}
+      {phase === 'loading' && <main className="center-overlay" role="status"><div className="loading-orbit">✦</div><span>PREPARING THE ARENA</span><h2>{loadingText}</h2><button className="text-button" onClick={backToMenu}>CANCEL</button></main>}
       {phase === 'error' && <main className="center-overlay" role="alert"><span>THE SET WAS INTERRUPTED</span><h2>Something missed a beat.</h2><p>{error}</p><button className="start-button narrow" onClick={backToMenu}>BACK TO TRACKS <span>↗</span></button></main>}
 
       {inFight && (
         <main className="fight-ui">
           <div className="fight-top">
-            <div className="now-playing"><span className="playing-icon">♫</span><span><small>NOW PLAYING</small><strong>{selected?.title}</strong></span><span className="track-bpm">{selected?.bpm} BPM</span></div>
+            <div className="now-playing"><span className="playing-icon">♫</span><span><small>NOW PLAYING</small><strong>{selected?.title}</strong></span><span className="track-bpm">{selected?.provider ? "≈ " : ""}{selected?.bpm} BPM</span>{selected?.provider && <span className="now-playing-credit"><a href={selected.provider.url} target="_blank" rel="noopener noreferrer">{selected.artist} · Jamendo</a>{selected.provider.licenseUrl && <> · <a href={selected.provider.licenseUrl} target="_blank" rel="noopener noreferrer">License</a></>}</span>}</div>
             <div className="fight-controls">
               <button onClick={() => setSettings(s => ({ ...s, muted: !s.muted }))} aria-label={settings.muted ? 'Unmute' : 'Mute'}>{settings.muted ? 'MUTED' : 'SOUND ON'}</button>
               <button onClick={() => setShowSettings(v => !v)} aria-label="Settings">SETTINGS</button>
@@ -337,10 +371,10 @@ export default function App() {
 
       {panel && <div className="modal-backdrop" onClick={() => setPanel(null)}><div className="info-modal" role="dialog" aria-modal="true" aria-label={panel} onClick={e => e.stopPropagation()}>
         <button className="modal-close" onClick={() => setPanel(null)} aria-label="Close">×</button>
-        {panel === 'help' && <><span className="modal-kicker">THE RULES OF THE FLOOR</span><h2>LET THE MUSIC FIGHT.</h2><p>Search by song, artist, or mood, or filter by language. Select a playable track, then hit Start Fight. Songs marked Audio Required are not ready to play. Your hero battles automatically in time with the music. Use Pause, volume, and the settings panel whenever you like.</p><p>The light show is designed to avoid rapid full-screen flashes. Reduced Flash and Reduced Motion are available in Settings. Press Space to pause or resume when the page itself has focus.</p></>}
+        {panel === 'help' && <><span className="modal-kicker">THE RULES OF THE FLOOR</span><h2>LET THE MUSIC FIGHT.</h2><p>Search by song, artist, or mood, or filter by language. Select a playable track, then hit Start Fight. Jamendo songs load on demand and get automatically estimated beat timing. Your hero battles automatically in time with the music. Use Pause, volume, and the settings panel whenever you like.</p><p>The light show is designed to avoid rapid full-screen flashes. Reduced Flash and Reduced Motion are available in Settings. Press Space to pause or resume when the page itself has focus.</p></>}
         {panel === 'moves' && <><span className="modal-kicker">THE MOVE BOOK</span><h2>50 WAYS TO FIGHT.</h2><p>Stylized game choreography across martial arts and fictional jutsu. Each song combines a different sequence of techniques.</p><ol className="move-book">{TECHNIQUES.map(technique => <li key={technique.id}><strong>{technique.name}</strong><small>{technique.discipline}</small></li>)}</ol></>}
-        {panel === 'credits' && <><span className="modal-kicker">CREDITS</span><h2>MADE FOR THE BEAT.</h2><p>Original demo music, effects, and venue were created for Fight Till Beat. Human fighters, DJ, and audience use Quaternius Universal Base Characters; animation sources are Universal Animation Library and Universal Animation Library 2 (CC0). The 50 stylized techniques combine these clips with project-authored limb targets, timing, throws, and fictional jutsu. Hair, clothing, cheering, cinematic direction, and beat choreography are project adaptations. Final rights review remains open.</p><ul>{tracks.map(track => <li key={track.id}>{track.title} — {track.artist}{!isPlayableTrack(track) ? ' · requested, audio not included' : ''}</li>)}</ul></>}
-        {panel === 'privacy' && <><span className="modal-kicker">PRIVACY PREVIEW</span><h2>YOUR SET, YOUR SPACE.</h2><p>This preview is operated by Neeraj Saini. It has no account, ads, or analytics. It stores only your volume, quality, and motion/flash preferences in your browser. Reset them in Settings.</p><p>The hosting provider may process request information such as IP address for delivery and security. A business contact address and full public privacy notice will be completed before production release.</p></>}
+        {panel === 'credits' && <><span className="modal-kicker">CREDITS</span><h2>MADE FOR THE BEAT.</h2><p>Original demo music, effects, and venue were created for Fight Till Beat. Human fighters, DJ, and audience use Quaternius Universal Base Characters; animation sources are Universal Animation Library and Universal Animation Library 2 (CC0). The 50 stylized techniques combine these clips with project-authored limb targets, timing, throws, and fictional jutsu. Hair, clothing, cheering, cinematic direction, and beat choreography are project adaptations. Final rights review remains open.</p><ul>{tracks.map(track => <li key={track.id}>{track.title} — {track.artist}{!isPlayableTrack(track) ? ' · requested, audio not included' : ''}</li>)}</ul>{selected?.provider && <p>Current song: <a href={selected.provider.url} target="_blank" rel="noopener noreferrer">{selected.title} — {selected.artist}, via Jamendo</a>{selected.provider.licenseUrl && <> · <a href={selected.provider.licenseUrl} target="_blank" rel="noopener noreferrer">Track license</a></>}. Fight timing is automatically generated.</p>}</>}
+        {panel === 'privacy' && <><span className="modal-kicker">PRIVACY PREVIEW</span><h2>YOUR SET, YOUR SPACE.</h2><p>This preview is operated by Neeraj Saini. It has no account, ads, or analytics. It stores only your volume, quality, and motion/flash preferences in your browser. Reset them in Settings.</p><p>Local track matching stays on your device. The shared search also sends your search words and supported language filter through our server to Jamendo after a 500 ms typing pause. The default empty search makes no Jamendo request. Hosting logs may include search request URLs. Preview or Start loads the selected audio directly from Jamendo, which receives your IP address and track request. Audio and generated beats stay temporarily in browser memory; no recording is saved for offline access. Artist and license links open the relevant provider pages.</p><p>The hosting provider may process request information such as IP address for delivery and security. A business contact address and full public privacy notice will be completed before production release.</p></>}
       </div></div>}
 
       <footer className="footer"><span>© {new Date().getFullYear()} FIGHT TILL BEAT <b>•</b> ORIGINAL DEMO</span><div><button onClick={() => setPanel('credits')}>CREDITS</button><button onClick={() => setPanel('privacy')}>PRIVACY</button><span className="footer-spark">✦</span></div></footer>

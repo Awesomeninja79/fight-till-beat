@@ -1,5 +1,9 @@
 # Security plan
 
+Audio playback update: search now projects validated provider stream URLs and CC license URLs alongside metadata. HTTPS host allowlists reject arbitrary hosts, embedded credentials and custom ports; known HTTP provider links are upgraded. Direct browser media fetches omit credentials/referrers, require provider CORS, time out after 60 seconds, and enforce 24 MB / 10-minute playback limits. Cancellation invalidates delayed decode/analysis results. One remote decoded buffer is retained; disposal clears buffers. Metadata proxy controls remain. Older metadata-only statements are superseded.
+
+Jamendo search adds a server-only Client ID, fixed upstream HTTPS endpoint, redirect rejection, validated/bounded inputs and pagination, eight-second timeout, redacted errors, validated metadata/stream/license projection and no-store responses. Identical active queries share one upstream request. An aggregate per-instance 30-request/minute limit retains no user identifiers; it is not distributed quota protection. Public enablement requires provider/platform abuse and cost review. Credential files are git-ignored. See [Jamendo](JAMENDO.md).
+
 ## Threat model
 
 V1 serves static code, audio, models, JSON, and text. There is no user-authenticated API or upload path. Main risks are compromised npm packages, malicious third-party media/scripts, exposed deployment credentials, stale or unlicensed public assets, cross-site scripting in UI content, and denial-of-service or runaway bandwidth charges. A later catalog administration API introduces authentication, authorization, upload, malware, and audit-log risks and needs its own threat model.

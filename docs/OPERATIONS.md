@@ -1,5 +1,9 @@
 # Operations and incident plan
 
+Jamendo playback troubleshooting: verify metadata includes an allowed audio URL, then inspect browser media CORS/network and decode failures. Start shows loading and beat-analysis phases and can be canceled; errors return to selection for retry. Limits are 24 MB, 10 minutes and a 60-second load timeout. Provider outages or unsupported streams do not change local originals. Direct media bandwidth flows from Jamendo to the visitor; test actual devices before release.
+
+Jamendo operations: missing `JAMENDO_CLIENT_ID` returns 503; input/method errors return 400/405, quota pressure 429, provider/network failures 502. Retry manually after recovery; do not log upstream credential-bearing URLs or bypass limits. Verify server-only configuration and provider application state. The 30/minute limiter and in-flight coalescing are per instance, not a global quota. To disable discovery, remove its server environment value and redeploy/restart; gameplay of local songs remains independent. See [Jamendo](JAMENDO.md).
+
 ## Ownership
 
 The site operator owns the domain, hosting plan, billing, privacy notice, support mailbox, contracts, and production approval. Engineering owns release builds, dependency updates, monitoring checks, and rollback. A designated rights reviewer owns the asset register and expiration calendar. One person may fill several roles, but names and backups should be recorded before launch.

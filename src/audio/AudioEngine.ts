@@ -16,6 +16,7 @@ export class AudioEngine {
   private muted = false
   private ended: (() => void) | null = null
   private playbackRequest = 0
+  private downloads = new Set<AbortController>()
 
   private async ensureContext() {
     if (!this.context) {
@@ -128,22 +129,61 @@ export class AudioEngine {
     }
   }
 
-  async load(url: string) {
+  async load(url: string, signal?: AbortSignal) {
     const context = await this.ensureContext()
+    signal?.throwIfAborted()
     const cached = this.buffers.get(url)
     if (cached) return cached
-    const response = await fetch(url)
-    if (!response.ok) throw new Error(`Music could not be loaded (${response.status}).`)
-    const buffer = await context.decodeAudioData(await response.arrayBuffer())
-    this.buffers.set(url, buffer)
-    return buffer
+    const controller = new AbortController()
+    this.downloads.add(controller)
+    const abort = () => controller.abort()
+    signal?.addEventListener('abort', abort, { once: true })
+    const timeout = setTimeout(abort, 60_000)
+    try {
+      const response = await fetch(url, { signal: controller.signal, credentials: 'omit', referrerPolicy: 'no-referrer' })
+      if (!response.ok) throw new Error(`Music could not be loaded (${response.status}).`)
+      const maxBytes = 24 * 1024 * 1024
+      if (Number(response.headers?.get('content-length')) > maxBytes) { await response.body?.cancel(); throw Error('This recording is too large to load (24 MB maximum).') }
+      let bytes: ArrayBuffer
+      if (response.body) {
+        const reader = response.body.getReader(), chunks: Uint8Array[] = []
+        let size = 0
+        while (true) {
+          const chunk = await reader.read()
+          if (chunk.done) break
+          size += chunk.value.byteLength
+          if (size > maxBytes) { await reader.cancel(); throw Error('This recording is too large to load (24 MB maximum).') }
+          chunks.push(chunk.value)
+        }
+        const joined = new Uint8Array(size)
+        let offset = 0
+        for (const chunk of chunks) { joined.set(chunk, offset); offset += chunk.byteLength }
+        bytes = joined.buffer
+      } else bytes = await response.arrayBuffer()
+      controller.signal.throwIfAborted()
+      const buffer = await context.decodeAudioData(bytes)
+      controller.signal.throwIfAborted()
+      if (buffer.duration > 600) throw Error('Choose a recording under 10 minutes for automatic fights.')
+      // Keep only one remote recording in memory, plus the small original catalog.
+      if (url.startsWith('https:')) for (const key of this.buffers.keys()) if (key.startsWith('https:')) this.buffers.delete(key)
+      this.buffers.set(url, buffer)
+      return buffer
+    } catch (reason) {
+      if (controller.signal.aborted && !signal?.aborted) throw Error('Music loading was canceled or timed out. Please try again.')
+      throw reason
+    } finally {
+      clearTimeout(timeout)
+      signal?.removeEventListener('abort', abort)
+      this.downloads.delete(controller)
+    }
   }
 
   async play(url: string, offset = 0, onEnded?: () => void) {
     this.stop()
     const request = this.playbackRequest
     const context = await this.ensureContext()
-    const buffer = await this.load(url)
+    let buffer: AudioBuffer
+    try { buffer = await this.load(url) } catch (reason) { if (request !== this.playbackRequest) return false; throw reason }
     if (request !== this.playbackRequest) return false
     const source = context.createBufferSource()
     source.buffer = buffer
@@ -179,6 +219,7 @@ export class AudioEngine {
 
   stop() {
     this.playbackRequest++
+    for (const download of this.downloads) download.abort()
     this.stopEffects()
     if (this.source) {
       const source = this.source
@@ -197,6 +238,7 @@ export class AudioEngine {
 
   dispose() {
     this.stop()
+    this.buffers.clear()
     void this.context?.close()
     this.context = null
     this.gain = null

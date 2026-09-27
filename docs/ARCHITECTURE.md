@@ -1,5 +1,11 @@
 # Technical architecture
 
+Current runtime update: selected Jamendo metadata persists independently of search visibility during play. Start loads/decodes direct provider audio and builds schema-v1 cues with src/audio/beatAnalysis.ts; originals still fetch authored cues. Both use AudioEngine’s clock and transport. Request tokens/AbortControllers invalidate stale loads and analysis. Provider audio is fetched by the browser, not the API proxy. See JAMENDO.md for bounds and data flow; this supersedes metadata-only behavior.
+
+Music rows share `src/TrackCard.tsx` across local and Jamendo results. Selection is mutually exclusive; both sources supply a Preview action and can start fights when audio is available. Provider attribution is displayed outside the selection button.
+
+Jamendo adds one read-only Node endpoint to the static-game architecture: `/api/jamendo`. The Vite development middleware and Vercel `api/jamendo.ts` share `server/jamendo.ts`; the Client ID stays server-side. `src/audio/useJamendoSearch.ts` debounces input/filter changes by 500 ms, aborts stale requests, suppresses duplicate active submits, and renders metadata/backlinks. Discovery results never reach AudioEngine. No database, account system, upload or remote-media playback is added. This narrowly supersedes the earlier no-backend assumption.
+
 ## Chosen tools and responsibilities
 
 | Layer | Tool | Responsibility |

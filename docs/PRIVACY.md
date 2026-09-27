@@ -1,5 +1,9 @@
 # Privacy and data protection plan
 
+Current direct-media flow: Preview or Start requests the selected stream from Jamendo storage, which receives the visitor IP and requested track. Decoded audio and estimated cues are held only in page memory; no recording is persisted or uploaded. Search still uses the debounced server metadata proxy. The in-app notice now describes both flows. This supersedes the earlier no-provider-audio statement.
+
+Jamendo discovery data flow: after a 500 ms typing/filter pause or a manual retry, query/language/page values go through the game server to Jamendo. They stay in page memory and are not deliberately logged or persisted by app code; hosting request logs may contain query URLs. Visitor identity headers are not forwarded upstream. Listening links open Jamendo. Game Tracks filtering remains local. The in-app privacy notice describes this distinction. No provider artwork, embedded player or user OAuth is added; direct audio requests are described above. Final notice/contact, retention and provider review remain open; see [Jamendo](JAMENDO.md).
+
 ## Data map for v1
 
 | Flow | Intended behavior | Evidence to collect |

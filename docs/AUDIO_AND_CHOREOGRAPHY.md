@@ -1,5 +1,7 @@
 # Audio timing and choreography
 
+Session-generated Jamendo fights now use approximately 10 ms per-channel energy, positive onset changes, normalized autocorrelation (65–180 BPM), local transient snapping, and bounded tempo adjustment. Relative energy drives attacks/dodges/rests with 800/1250/1600 ms recovery. Sixteen-beat phrase groups are provisional; a 120 BPM grid is used when no pulse is found, and silence has no attacks. BPM is marked approximate. Analysis yields to cancellation and runs before the same Web Audio clock starts. These temporary runtime maps bypass authored-publication review at the owner’s request; they do not mark imported production assets reviewed. Full-track audible accuracy remains unverified.
+
 ## Timing contract
 
 The selected song's Web Audio `AudioContext.currentTime` is the only clock used for gameplay. On Start, schedule a decoded `AudioBufferSourceNode` for a near-future context time `t0`. Current song time is `context.currentTime - t0 + seekOffset` while playing. On pause, store song position and stop the one-shot source. On resume, create a new source starting at that offset. AudioBufferSourceNode can only be started once, so a new node is required after pause/restart. [Web Audio start](https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/start), [audio clock](https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/currentTime).

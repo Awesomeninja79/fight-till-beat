@@ -1,5 +1,13 @@
 # Accessibility and motion safety
 
+Jamendo cards now expose the same named Preview/Stop Preview button and Select/aria-pressed behavior as originals. Start is enabled for a selected result with a stream; the blanket licensing/preparation message is removed. Loading announces loading/analysis status with a Cancel button. Missing audio and load errors remain explicit. Playback uses existing pause/resume, mute, effects-volume and reduced-motion/flash controls. Provider/license links have visible attribution.
+
+Shared music cards expose Select [title] and aria-pressed for either source. Provider attribution links name Jamendo; selecting a result with audio enables Start. Decorative waveforms are aria-hidden.
+
+Unified search update: one shared field/filter pair and results list, no source selector. Combined counts are announced politely; local results remain available during provider failures. Remote rows identify the artist/provider and give an accessible listening link; they are not misleading disabled game-selection buttons.
+
+Jamendo search uses a single shared search/filter pair, explicit input/select labels, native submit/link controls, a polite result-count status and error alerts. Search waits 500 ms after typing to reduce requests and announcements; users may retry failures explicitly. Result links identify Jamendo and open separately. The Lean On unavailable card was removed at owner request. Responsive/keyboard browser checks do not replace full screen-reader and contrast review.
+
 Music catalog controls use visible Search Music/Language labels, native keyboard-operable search/select elements, existing focus outlines, and a polite result-count status. Empty results offer Clear Filters; Start is disabled when the selected track is outside the results. The controls stack on narrow screens. Desktop/mobile browser flows cover discovery and horizontal overflow; screen-reader usability and full contrast audits remain manual gates.
 
 ## Target and design

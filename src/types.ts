@@ -12,6 +12,7 @@ export type Track = {
   audio: string
   cues: string
   rightsId: string
+  provider?: { url: string; licenseUrl: string }
 }
 
 export type RequestedTrack = {

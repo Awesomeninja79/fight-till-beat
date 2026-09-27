@@ -1,8 +1,12 @@
 # Rights, copyright, and credits
 
+Runtime policy update: at the owner’s explicit request, Jamendo playback is no longer blocked by license category or missing authored cues. The app retains artist, provider and supplied license links, and does not label streams rights-cleared. Personal-project intent is recorded; API/per-track conditions and any later commercial/public usage review remain unresolved. Older discovery-only restrictions are superseded, not evidence of clearance.
+
+Jamendo search includes singles and albums across the provider catalog, credits artists/provider and links to source pages; developer access does not grant game-use rights. No Jamendo audio/artwork has been added as a production asset. Lean On is no longer listed, per owner request on 2026-09-27; MUSIC-004 remains an unresolved historical request, not clearance. Confirm exact recording rights and applicable commercial API agreement before ingestion/public enablement.
+
 ## Release policy
 
-Lean On (MUSIC-004): the owner reports permission and possession of authorized audio. No recording or private scope evidence has been supplied. Metadata is listed with full artist credits; audio, preview, and choreography are absent. Do not substitute a sample, unofficial remix, or cover for the requested original. No free game-use source was verified in this work. Library/API access is not itself track clearance.
+Lean On (MUSIC-004): the owner reports permission and possession of authorized audio. No recording or private scope evidence has been supplied. The metadata placeholder was removed at owner request on 2026-09-27; audio, preview, and choreography remain absent. Do not substitute a sample, unofficial remix, or cover for the requested original. No free game-use source was verified in this work. Library/API access is not itself track clearance.
 
 An asset may be used in a protected prototype only if its use there is permitted. No asset may enter a public build unless its [asset register](../ASSET_REGISTER.md) row is marked Cleared, the evidence can be retrieved, and its credits/limitations are implemented. The project owner or designated rights reviewer signs off the release manifest. Legal counsel should review final agreements for the chosen launch markets. No technical control can guarantee freedom from claims.
 

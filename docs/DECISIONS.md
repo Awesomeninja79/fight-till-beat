@@ -1,5 +1,13 @@
 # Decision register
 
+2026-09-27 owner decision: enable all Jamendo results with supported audio, without a license-category or manual beat-map runtime gate. The owner describes the app as a personal project. Remove prolicensing-only search, add on-demand playback and automatic transient-based fight generation, retain artist/provider/license links. This supersedes the earlier discovery-only restriction; it is not approval of every recording’s rights. Monetization/public-use review stays open.
+
+Historical UI clarification (playback restriction superseded by the owner decision above): the owner requested one shared music search/filter and result list, with three originals by default and no source tabs. Both sources now share a selectable track-card component. Library listening links remain distinct from local previews because remote game audio and reviewed cue maps are not yet supplied; discovery results cannot launch fights.
+
+Owner UI correction, 2026-09-27: no music-source tabs. Keep the three originals by default; the same search and language control combine local matches with debounced Jamendo metadata in one track list. Preserve per-result availability and artist attribution. This supersedes the earlier separate-library-view implementation.
+
+Resolved on 2026-09-27: owner selected Jamendo, supplied the application Client ID, requested debouncing/API efficiency and removal of the Lean On unavailable entry. D-07/D-13 now use Jamendo for metadata discovery with a 500 ms debounce, cancellation and in-flight deduplication. Provider choice is closed; exact recordings, permissions, commercial API agreement, budget and public deployment are still open. Local configuration is authorized; no purchase or license acceptance is inferred.
+
 Planning assumptions are explicit so implementation can proceed where safe. The project owner resolves items that affect external obligations before final content or deployment.
 
 | ID | Decision | Current assumption | Needed by | Impact |
@@ -10,7 +18,7 @@ Planning assumptions are explicit so implementation can proceed where safe. The 
 | D-04 | Music source | Original, commissioned, or directly licensed independent/production music with written game-use rights; owner approved a small English/Hindi catalog on 2026-09-26. Provider, budget, and recordings remain undecided. | Content complete | Composition/master/sample clearance |
 | D-05 | Visual style | Owner rejected block-like fighters on 2026-09-26 and requested real characters with cool fighting animation. Follow-up owner direction rejects rigid motion and calls for anime-style combat, cinematic angles, and expressive moves. Retain the humanoid rig and neon venue while adding speed ramps, combinations, aerial movement, stylized rendering, and a music-driven shot director. Current local implementation uses Quaternius humanoids with outfit variants; final visual approval and distinct character identities remain open. | Vertical slice art | Asset creation and performance |
 | D-06 | Mobile launch support | Yes, with Low preset | QA device selection | Performance and UI scope |
-| D-07 | Catalog size at launch | Three playable originals plus requested Lean On. Broad music search requested; no provider connected yet. | Architecture | Static manifest versus catalog service |
+| D-07 | Catalog size at launch | Three playable originals; Jamendo metadata discovery connected locally. Lean On placeholder removed at owner request. | Architecture | Static manifest versus catalog service |
 | D-08 | Future streaming-service integration | None | Future roadmap | Separate negotiated rights and provider terms |
 | D-09 | Custom domain/brand name | Undecided | Branding and deployment | Trademark check, DNS, public URLs |
 | D-10 | Budget and operations coverage | Undecided | Hosting setup | Plan tier, spend alerts, response commitments |

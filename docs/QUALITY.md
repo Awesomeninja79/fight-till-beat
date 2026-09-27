@@ -1,6 +1,32 @@
 # Quality assurance and performance plan
 
+## Jamendo playback verification, 2026-09-27
+
+pnpm check passed: TypeScript, 30 Vitest tests, eight Node pipeline tests, three-original catalog validation and production build. The final build was repeated successfully after cancellation cleanup and clickable in-fight credits were finalized. New analysis checks cover a known offset 120 BPM pulse, recovery spacing, quiet/silent passages, invalid samples, opposite-phase stereo and cancellation. Provider tests cover stream/license URL validation and removal of license-category search filtering. Existing bundle-size warning remains.
+
+Two focused desktop Chrome playback tests passed: on-demand preview, automatic cues/BPM, selected-song identity, pause/resume, completion/replay, return to menu, canceled downloads that cannot start later, failed-audio retry and provider/license attribution. An initial test locator incorrectly required an exact button name without its visible arrow; it was corrected. Initial cold-start/search timeouts were observed under local browser load; the initial catalog assertion uses a 15-second allowance. A live-provider attempt was interrupted by development hot reload during preparation and is not counted as passing. The mobile run passed the full preview/transport/completion/replay case and all three shared-search cases. Its cancel/retry case exposed same-query refresh clearing the selected row; refreshing now retains existing rows, and the focused cancel/retry rerun passed on desktop and mobile (2/2). The final production build passed after this fix. These are focused runs rather than a claim that the full cross-browser suite passed.
+
+Final live-provider evidence: a real search returned HTTP 200 with 12 stream-bearing results. Track 1537377 (03 И это всё о нём by КЫНО, 4:13) was fetched directly from Jamendo, decoded, analyzed at an estimated 98 BPM, and played in the arena with advancing time and generated attack/combo events. Pause/resume succeeded and the desktop fight screenshot was inspected. Several earlier live selector waits timed out; the instrumented final run confirmed the response, rendered rows and playback. This checks the playback path, not full-track audible accuracy or every provider recording.
+
+Runtime playback is a distinct owner-authorized path from publishing reviewed catalog recordings. Automatic timing is estimated, not human-reviewed. Physical devices, Safari, measured full-song audible contact accuracy, public deployment, rights/API conditions and final privacy/contact review remain open. No provider recording or generated cue file was added to production assets.
+
+## Unified Jamendo verification, 2026-09-27
+
+The preceding discovery-only change passed pnpm check: TypeScript, 26 Vitest tests, eight Node pipeline tests, validation of three playable originals/no requested placeholders, and production build. Proxy tests cover validation, configuration, projection, provider errors, rate limiting, and coalescing without completed-result caching. The existing large bundle warning remains.
+
+The sequential desktop/mobile Chrome suite passed 14 of 16 cases, including all six Jamendo browser cases (debounce, shared results/selection/reset, retries preserving originals, stale responses and deduplicated pagination) plus transport, privacy, hidden Lean On and model-load recovery. The two catalog cases timed out at the initial five-second loading assertion; snapshots showed the loaded originals. That initial-load assertion now allows 15 seconds; interaction assertions remain unchanged. The focused rerun passed both desktop and mobile catalog cases (2/2, 1.8 minutes), completing coverage of all 16 Chrome cases across the main run and rerun. The default all-browser attempt was interrupted after WebKit could not launch because its browser binary is absent. Safari and physical-device verification remain open.
+
+A real local Jamendo search returned 12 songs through the configured endpoint. Desktop (1440px) and mobile (393px) screenshots were inspected: shared card layout, wrapped titles, no horizontal overflow, and no page JavaScript errors. This proves local discovery, not provider audio playback, licensing, production deployment or full-song synchronization. The server credential was checked absent from the built client bundle.
+
+Open production gates: provider/API and per-recording permissions, prepared/reviewed beat maps, production environment/deployment and abuse quotas, privacy/contact, accessibility, physical-device performance and audible timing review. No remote production audio asset was added.
+
 ## Automated checks
+
+### Music continuation verification, 2026-09-27
+
+Resumed verification against commit `6696d2f` after the interruption and intervening catalog accessibility/CI fixes. `pnpm check` passed: 21 Vitest tests, eight Node music-pipeline tests, content validation, typecheck, and production build. This includes out-of-order/canceled preview downloads, preserving the resume offset during startup lead time, and energy-based rests/dodges/attacks. The earlier 5-second skeletal-test timeout did not recur in this isolated run.
+
+The focused catalog browser flow passed on installed desktop Chrome and mobile Chromium emulation (two tests, 35.4 seconds total), covering search, language filters, unavailable English content, Hindi empty state, hidden-selection blocking, reset, and horizontal overflow. Mobile catalog screenshot was inspected. This run did not repeat the entire transport suite or test Safari/actual phones. Existing large-bundle and Three.js deprecation warnings remain; song rights, full-track audible timing, accessibility, privacy/contact, and real-device performance gates remain open. No new recording or deployment was made by this resumed verification.
 
 ### Offline music expansion evidence, 2026-09-26
 

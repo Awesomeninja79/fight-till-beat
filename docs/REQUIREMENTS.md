@@ -1,5 +1,11 @@
 # Product requirements
 
+FR-16: one shared Search Music field and language filter; no source tabs. Default empty query/All shows exactly three originals with zero provider calls. Local matches appear immediately; remote matches append after 500 ms. Stale requests are canceled, pagination deduplicates, errors preserve local matches, and Reset restores defaults. Search includes singles/albums without prolicensing-only filtering.
+
+FR-17: every Jamendo result with a supported stream exposes Preview and Start, with no runtime license-category or manual-cue gate (owner decision). Start decodes the song, estimates beat timing, generates recoverable fight actions and uses the existing audio clock. Acceptance: correct remote song/title/duration, no media fetch until user playback intent, approximate BPM, pause/resume, completion/replay, cancel/stale-load protection, failed-audio retry, provider/license credits, and direct-media privacy disclosure. Bounds: 24 MB, ten minutes and 60-second loading timeout; report technical failures clearly. Silent/beatless songs remain playable with an estimated grid and energy-dependent rests. Auto timing is not a human-review assertion.
+
+FR-01/FR-14: the Lean On placeholder remains removed. Original local tracks retain authored maps; dynamic provider songs do not modify the shipped manifest. Publication rights, API/commercial conditions and audible timing quality remain review gates.
+
 ## Users and supported environment
 
 The visitor wants to select a song and watch a stylish fight synchronized to it. Launch targets current stable desktop Chrome, Edge, Firefox, and Safari, plus current mobile Chrome and Safari on reference devices recorded in the QA report. Keyboard operation applies to all menus and transport controls. The 3D spectacle requires WebGL2; unsupported devices receive a clear fallback rather than a blank canvas. [Three.js WebGL renderer](https://threejs.org/docs/pages/WebGLRenderer.html).
@@ -8,7 +14,7 @@ The visitor wants to select a song and watch a stylish fight synchronized to it.
 
 | ID | Requirement | Acceptance evidence |
 | --- | --- | --- |
-| FR-01 | Show the three playable originals and any additional cleared, reviewed catalog tracks with metadata/preview, plus explicitly unavailable requested entries. Lean On displays Major Lazer & DJ Snake feat. MØ and remains unavailable until authorized audio/cues arrive. | New IDs require audio hash and timing/rights review metadata; playable previews work; requested entries have no playback controls or audio requests. |
+| FR-01 | Show the three playable originals and any additional cleared, reviewed catalog tracks with metadata/preview, plus explicitly unavailable requested entries. The owner-requested Lean On placeholder is removed; Jamendo discovery results appear in the shared list with listening links. | New IDs require audio hash and timing/rights review metadata; playable previews work; requested entries have no playback controls or audio requests. |
 | FR-02 | Selection precedes Start Fight; no music autoplays on page load. | Fresh page is silent; Start begins selected track and fight. |
 | FR-03 | Hero fights automatically using punches, kicks, dodges, throws/launches, and a finisher. | Each track's cue sheet and capture show the planned moves. |
 | FR-04 | Opponents react to contact; visual impacts align to marked beats. | Audio/video capture and cue audit show hit alignment. |

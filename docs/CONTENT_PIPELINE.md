@@ -1,5 +1,9 @@
 # Music, sound, and 3D content pipeline
 
+New separate playback path: provider songs may be decoded and analyzed transiently in the browser without entering the production catalog. The owner explicitly requested automatic Jamendo fights with no manual-preparation runtime gate. These temporary maps do not satisfy or bypass the hash/review checks for publishing authored files below; no stream bytes or generated maps are written to public/. See JAMENDO.md.
+
+Jamendo is now a discovery source only. Search results identify licensing candidates and link to Jamendo; they are not downloaded, copied into public assets or automatically analyzed. Once an exact permitted recording is obtained, use the existing private analysis/review/hash workflow. Lean On was removed from the public manifest at the owner’s request. See [Jamendo](JAMENDO.md).
+
 ## Source-to-release flow
 
 The local prototype currently uses `scripts/generate-music.py` to render three deterministic original WAV tracks and cue maps, and `src/scene/ClubScene.tsx` to render original procedural 3D characters/venue. No imported audio samples or external fonts are used; humanoid GLB imports and current authoring are detailed below. The steps below describe the later production art/music pipeline.

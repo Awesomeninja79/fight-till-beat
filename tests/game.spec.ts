@@ -1,9 +1,11 @@
 import { expect, test } from '@playwright/test'
 
-test('search and language filters preserve unavailable songs and prevent hidden selection playback', async ({ page }) => {
+test.beforeEach(async ({ page }) => { await page.route('**/api/jamendo?**', route => route.fulfill({ json: { tracks: [], nextOffset: null } })) })
+
+test('search and language filters reset to originals and prevent hidden selection playback', async ({ page }) => {
   test.slow() // Multiple catalog reflows plus a full-page GPU screenshot exceed 30 seconds on CI runners.
   await page.goto('/')
-  await expect(page.getByRole('button', { name: 'Select Neon Strike' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Select Neon Strike' })).toBeVisible({ timeout: 15_000 })
   await page.getByLabel('SEARCH MUSIC').fill('after hours')
   await expect(page.locator('.track-card')).toHaveCount(1)
   await expect(page.getByRole('button', { name: 'START THE FIGHT' })).toBeDisabled()
@@ -14,12 +16,11 @@ test('search and language filters preserve unavailable songs and prevent hidden 
   await expect(page.getByText('No matching tracks yet.')).toBeVisible()
   await expect(page.getByRole('button', { name: 'START THE FIGHT' })).toBeDisabled()
   await page.getByLabel('LANGUAGE', { exact: true }).selectOption('en')
-  await expect(page.locator('.track-card')).toHaveCount(1)
-  await expect(page.locator('.track-card')).toContainText('Lean On')
+  await expect(page.locator('.track-card')).toHaveCount(0)
   await expect(page.locator('.track-card button')).toHaveCount(0)
   await page.getByLabel('SEARCH MUSIC').fill('not in catalog')
   await page.getByRole('button', { name: 'CLEAR FILTERS' }).click()
-  await expect(page.locator('.track-card')).toHaveCount(4)
+  await expect(page.locator('.track-card')).toHaveCount(3)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
   await page.screenshot({ path: test.info().outputPath('music-catalog.png'), fullPage: true })
 })
@@ -55,13 +56,12 @@ test('privacy and accessibility controls are reachable', async ({ page }) => {
   await expect(page.getByText('Neeraj Saini')).toBeVisible()
 })
 
-test('requested Lean On entry is credited and cannot start missing audio', async ({ page }) => {
+test('unavailable Lean On request is hidden and does not request audio', async ({ page }) => {
   const missingAudio: string[] = []
   page.on('request', request => { if (request.url().includes('/audio/lean-on')) missingAudio.push(request.url()) })
   await page.goto('/')
   const entry = page.locator('article').filter({ hasText: 'Lean On' })
-  await expect(entry).toContainText('Major Lazer & DJ Snake feat. MØ')
-  await expect(entry).toContainText('AUDIO REQUIRED')
+  await expect(entry).toHaveCount(0)
   await expect(entry.getByRole('button')).toHaveCount(0)
   expect(missingAudio).toEqual([])
 })
