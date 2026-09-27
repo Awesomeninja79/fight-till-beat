@@ -19,4 +19,6 @@ An internal ingestion/admin service requires separate admin authentication with 
 
 ## Security gate
 
+The local music-analysis CLI bounds input to 100 MB, accepts only supported PCM WAV layouts, checks RIFF/chunk boundaries, and creates output exclusively so existing files are not overwritten. It resolves output parents and rejects drafts under repository `public/` or `dist/`. This is an operator tool, not a hardened untrusted-upload service or malware scanner. It must not be exposed as a public upload endpoint. Corrected beat arrays are validated; newly published songs require exact recording hashes and human review metadata. Review metadata is an attestation and not cryptographic authorization.
+
 Production build, typecheck, dependency review, secret/output scan, CSP/header check, preview access check, and a documented security-contact path pass before launch. Any high-severity exploitable issue blocks release until fixed or formally risk-reviewed by the operator.

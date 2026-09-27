@@ -1,4 +1,5 @@
 node_modules/
+.music-work/
 .pnpm-store/
 dist/
 playwright-report/
@@ -9,3 +10,6 @@ test-results/
 *.log
 *.blend1
 *.tsbuildinfo
+
+.vercel
+.env*

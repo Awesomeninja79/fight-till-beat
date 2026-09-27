@@ -15,6 +15,7 @@ export class AudioEngine {
   private effectsVolume = 0.55
   private muted = false
   private ended: (() => void) | null = null
+  private playbackRequest = 0
 
   private async ensureContext() {
     if (!this.context) {
@@ -80,6 +81,23 @@ export class AudioEngine {
       const at = this.startedAt + event.atMs / 1000 - this.offset
       if (at < context.currentTime + 0.015) continue
       const heavy = event.kind === 'kick' || event.kind === 'finisher'
+      const swooshAt = at - 0.13
+      if (swooshAt > context.currentTime + 0.015) {
+        const swoosh = context.createBufferSource()
+        const air = context.createBiquadFilter()
+        const envelope = context.createGain()
+        swoosh.buffer = this.noiseBuffer
+        air.type = 'bandpass'
+        air.frequency.setValueAtTime(heavy ? 650 : 1100, swooshAt)
+        air.frequency.exponentialRampToValueAtTime(3400, at)
+        air.Q.value = 0.7
+        envelope.gain.setValueAtTime(0.0001, swooshAt)
+        envelope.gain.exponentialRampToValueAtTime(heavy ? 0.075 : 0.045, at - 0.025)
+        envelope.gain.exponentialRampToValueAtTime(0.0001, at)
+        swoosh.connect(air).connect(envelope).connect(this.effectsGain)
+        swoosh.start(swooshAt); swoosh.stop(at)
+        this.effectSources.push(swoosh)
+      }
       const duration = event.kind === 'finisher' ? 0.24 : heavy ? 0.17 : 0.12
       const osc = context.createOscillator()
       const body = context.createGain()
@@ -122,9 +140,11 @@ export class AudioEngine {
   }
 
   async play(url: string, offset = 0, onEnded?: () => void) {
+    this.stop()
+    const request = this.playbackRequest
     const context = await this.ensureContext()
     const buffer = await this.load(url)
-    this.stop()
+    if (request !== this.playbackRequest) return false
     const source = context.createBufferSource()
     source.buffer = buffer
     source.connect(this.gain!)
@@ -140,6 +160,7 @@ export class AudioEngine {
       this.ended?.()
     }
     source.start(this.startedAt, offset)
+    return true
   }
 
   pause() {
@@ -152,11 +173,12 @@ export class AudioEngine {
   }
 
   async resume(onEnded?: () => void) {
-    if (!this.activeUrl) return
-    await this.play(this.activeUrl, this.offset, onEnded)
+    if (!this.activeUrl) return false
+    return this.play(this.activeUrl, this.offset, onEnded)
   }
 
   stop() {
+    this.playbackRequest++
     this.stopEffects()
     if (this.source) {
       const source = this.source
@@ -170,7 +192,7 @@ export class AudioEngine {
 
   getTime() {
     if (!this.source || !this.context) return this.offset
-    return Math.max(0, this.offset + this.context.currentTime - this.startedAt)
+    return this.offset + Math.max(0, this.context.currentTime - this.startedAt)
   }
 
   dispose() {

@@ -1,6 +1,7 @@
 [
   {
     "id": "neon-strike",
+    "language": "instrumental",
     "title": "Neon Strike",
     "artist": "Fight Till Beat Original",
     "bpm": 128,
@@ -16,6 +17,7 @@
   },
   {
     "id": "after-hours",
+    "language": "instrumental",
     "title": "After Hours",
     "artist": "Fight Till Beat Original",
     "bpm": 112,
@@ -31,6 +33,7 @@
   },
   {
     "id": "laser-rush",
+    "language": "instrumental",
     "title": "Laser Rush",
     "artist": "Fight Till Beat Original",
     "bpm": 142,
@@ -43,5 +46,16 @@
     "audio": "/audio/laser-rush.wav",
     "cues": "/content/laser-rush.json",
     "rightsId": "MUSIC-003"
+  },
+  {
+    "id": "lean-on",
+    "language": "en",
+    "title": "Lean On",
+    "artist": "Major Lazer & DJ Snake feat. MØ",
+    "status": "audio-required",
+    "mood": "REQUESTED TRACK",
+    "colors": ["#ffd477", "#ec6b9b"],
+    "rightsId": "MUSIC-004",
+    "availabilityNote": "Requested · waiting for the authorized audio file."
   }
 ]

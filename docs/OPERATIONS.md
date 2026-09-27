@@ -31,3 +31,6 @@ For v1, prioritize a rollback or track disable within the operator's active supp
 ## Change control
 
 Every new song, sound, model, dependency, analytics SDK, external service, or user-data feature passes the matching rights, privacy, security, accessibility, and quality gates before publishing. Release notes list changed content and code, reviewer, and rollback target.
+
+## Current public baseline
+On 2026-09-26, owner-authorized release `3dda054` became production `dpl_AVTMY3GND6iBiRs8dbrEQkbxyrX6` at https://project-3te70.vercel.app/. Use this domain for anonymous availability checks; team/deployment aliases may require Vercel sign-in. Preserve this first successful public deployment as the recovery baseline; no earlier production rollback target exists. Automatic production builds are enabled, while GitHub main branch protections and preview authentication remain in place. Future releases follow the protected-main workflow. Support contact, response coverage, monitoring/budget configuration and rollback rehearsal remain open. See [deployment](DEPLOYMENT.md) for evidence and known limitations.

@@ -2,6 +2,8 @@
 
 ## Release policy
 
+Lean On (MUSIC-004): the owner reports permission and possession of authorized audio. No recording or private scope evidence has been supplied. Metadata is listed with full artist credits; audio, preview, and choreography are absent. Do not substitute a sample, unofficial remix, or cover for the requested original. No free game-use source was verified in this work. Library/API access is not itself track clearance.
+
 An asset may be used in a protected prototype only if its use there is permitted. No asset may enter a public build unless its [asset register](../ASSET_REGISTER.md) row is marked Cleared, the evidence can be retrieved, and its credits/limitations are implemented. The project owner or designated rights reviewer signs off the release manifest. Legal counsel should review final agreements for the chosen launch markets. No technical control can guarantee freedom from claims.
 
 ## Music checklist
@@ -21,5 +23,7 @@ Preferred acquisition is original commissioned music with signed contributor agr
 - If a rights complaint arrives, record it, disable the track/asset, preserve evidence, and escalate to the operator and counsel. See [operations](OPERATIONS.md).
 
 ## Publishing gate
+
+The offline analyzer always writes `review.status: draft` and false timing/rights approvals. New playable catalog IDs fail content validation without a matching audio SHA-256, language, approved review flags, reviewer identifier, and review date. These fields record reviewer attestations; code does not authenticate the reviewer or inspect private contracts. Human asset-register/evidence review remains mandatory. No new production asset or license has been acquired through the English/Hindi pipeline change, so the asset register and public credits are unchanged.
 
 The release manifest contains only rights IDs in Cleared status. CI checks that each referenced asset maps to a valid rights ID; human review verifies actual evidence and contract scope. The catalog expansion service must automatically unpublish expired or withdrawn songs. Evidence files stay in private storage and are never bundled with the game.

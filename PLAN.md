@@ -1,6 +1,6 @@
 # Production plan
 
-**Current state:** local playable build in progress. Three original code-generated demo tracks, procedural 3D arena, automatic beat cues, settings, and initial tests exist. Public release gates remain open. See [README.md](README.md) for current files.
+**Current state:** [The game is live](https://project-3te70.vercel.app/) on Vercel production, deployment `dpl_AVTMY3GND6iBiRs8dbrEQkbxyrX6`, source commit `3dda054`. Remote CI passed. Anonymous HTTP access, game start, 50-entry technique book, pause, and return to the tracklist passed with no browser errors. `main` remains the protected default branch; this first public release was promoted from the tested `dev` preview. Automatic builds are enabled. Manual rights/privacy/accessibility/performance and full-track timing reviews remain open; owner authorization does not mark them passed. See [README.md](README.md) for current files.
 
 ## Product
 
@@ -8,9 +8,19 @@ Visitors choose one of three built-in songs, press **Start Fight**, and watch a 
 
 ## Technical baseline
 
-Vite + React + TypeScript produce a static app. Three.js and React Three Fiber render the arena. The Web Audio API supplies the authoritative song clock. Versioned JSON cue maps drive choreography and effects. The current build uses procedural original 3D geometry and three deterministic, code-generated WAV tracks; GLB imports remain a later art upgrade. Vercel is the proposed static host. Detailed responsibilities and interfaces are in [architecture](docs/ARCHITECTURE.md) and [audio/choreography](docs/AUDIO_AND_CHOREOGRAPHY.md).
+Latest owner-requested scope: 50 stylized techniques spanning boxing, karate, Muay Thai, taekwondo, kung fu/Wing Chun, capoeira, judo-inspired throws, and fictional jutsu. These combine source animation with parameterized procedural motion; they are not 50 motion-capture clips or certified demonstrations. Human models replace the DJ and audience placeholders; the crowd claps and pumps fists. Lean On is listed but awaits its authorized recording. The owner reports permission; scope evidence has not been supplied. Broad library search is researched but not connected.
+
+Vite + React + TypeScript produce a static app. Three.js and React Three Fiber render the arena. The Web Audio API supplies the authoritative song clock. Versioned JSON cue maps drive choreography and effects. The local character upgrade replaces primitive fighters with a textured, skinned Quaternius humanoid and independently cloned skeletons, colored outfits, jab/cross/reaction clips, accelerated combinations, airborne kick/finisher poses, and an anime camera/effects pass. The arena remains procedural; DJ and crowd now use the shared human rig; the three WAV tracks remain code-generated. Models and a reduced animation GLB are served locally and loaded before fight playback. Vercel is the proposed static host. Detailed responsibilities and interfaces are in [architecture](docs/ARCHITECTURE.md) and [audio/choreography](docs/AUDIO_AND_CHOREOGRAPHY.md).
+
+Character upgrade checks: eleven logic tests, content validation, production build, and six desktop/mobile Chromium flow tests passed locally on 2026-09-26. Chrome screenshots were inspected for humanoid rendering and combat poses. Full-track timing measurements, real-device performance, visual approval, asset/operator review, accessibility, and public release gates remain open. This local change has not been deployed.
 
 ## Delivery stages
+
+Music continuation: local catalog search and language filters, accurate playable counts, filtered selection handling, stale-preview cancellation, and energy-aware draft choreography are implemented. Three instrumental originals are still the playable catalog; Lean On remains an English requested entry and Hindi has an explicit empty state. Song sourcing (owner-supplied recordings versus paid library), licensing, and human timing review remain unresolved. No new production recording or asset credit is introduced, and no deployment is included.
+
+Music expansion, 2026-09-26: owner approved a small cleared English/Hindi catalog with offline beat analysis and human correction. The local `music:analyze` command now produces hash-bound draft cues from WAV recordings, with language metadata and correction-file support. New catalog IDs require timing/rights review metadata and exact audio hashes at content validation. The existing three originals remain playable; no additional recording, music provider, or new deployment is included. Automatic analysis is a steady-tempo proposal, not verified support for every song. Provider/budget, actual recordings, permissions, full-song corrections, and measured synchronization remain open.
+
+Music pipeline verification: `pnpm check` passed with 19 existing logic tests, seven offline pipeline tests, typecheck, content validation, and build. No browser test rerun or deployment for this offline authoring change; see [quality](docs/QUALITY.md) for scope and remaining gates.
 
 | Stage | Output | Gate |
 | --- | --- | --- |
@@ -27,8 +37,19 @@ Vite + React + TypeScript produce a static app. Three.js and React Three Fiber r
 - No user-level analytics, advertising, or third-party scripts at initial launch. The hosting provider still processes request metadata; the notice must describe the observed data flow. See [privacy](docs/PRIVACY.md).
 - Light effects are safe by default, with reduced flash and motion options. See [accessibility](docs/ACCESSIBILITY.md).
 - Any new accounts, uploads, user-selected music, social features, payments, or ads trigger a new architecture, rights, privacy, and security review.
-- No public launch until the legal operator, commercial status, launch countries, and music source are known. These are tracked in [decisions](docs/DECISIONS.md).
+- The owner explicitly authorized making the current build public on 2026-09-26. Pending business contact, rights review, privacy notice, regional review, and release evidence remain unresolved; deployment authorization does not mark them complete. Operator, initial monetization posture, worldwide intent, and original music source are recorded in [decisions](docs/DECISIONS.md).
 
 ## Release authority
 
 The project owner approves public branding, licenses, privacy text, hosting account/budget, and the final production release after reviewing a working preview and evidence. A qualified lawyer should review rights and regional privacy obligations for the chosen launch markets. Engineering verifies the application and records results in the release checklist. Planning documents alone do not establish legal clearance.
+
+
+Latest verification: pnpm check passed with 19 logic tests, content validation, typecheck, and build. All 50 techniques are referenced in the playable cues, and all eight desktop/mobile Chromium flows passed, including the move book and unavailable Lean On entry. Final camera/DJ captures also verify frozen active-pose stability. See [quality](docs/QUALITY.md) for measured evidence and remaining release gates. The current work is local and has not been deployed.
+
+Deployment requested on 2026-09-26: the current build is being published to the existing protected dev preview. This supersedes the earlier local-only status; production release gates remain open. See the deployment log for completion evidence.
+
+Preview deployment completed for commit 3dda054: https://fight-till-beat-2p1n39ewf-nsrathore7912-4985s-projects.vercel.app . Vercel reports Preview/success and sign-in protection was verified. Public production was not enabled. Authenticated deployed-game smoke testing remains open because the current connector lacks project-team access.
+
+Public release follow-up: owner requested making the site live. CI run `36241892802` for `3dda054` completed successfully. Promotion is blocked by access to the owning Vercel team; reconnection requested. The existing preview remains protected until production promotion and anonymous smoke testing are verified.
+
+Public release completed on 2026-09-26 after direct Vercel CLI login restored team access. See [deployment](docs/DEPLOYMENT.md) for the live domain, exact build identity and verification evidence. Earlier pending-access notes above are historical.

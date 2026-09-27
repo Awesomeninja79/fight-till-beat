@@ -8,18 +8,21 @@ The visitor wants to select a song and watch a stylish fight synchronized to it.
 
 | ID | Requirement | Acceptance evidence |
 | --- | --- | --- |
-| FR-01 | Show exactly three launch tracks with title, creator, duration, and preview. | Picker displays metadata; each preview can start/stop. |
+| FR-01 | Show the three playable originals and any additional cleared, reviewed catalog tracks with metadata/preview, plus explicitly unavailable requested entries. Lean On displays Major Lazer & DJ Snake feat. MØ and remains unavailable until authorized audio/cues arrive. | New IDs require audio hash and timing/rights review metadata; playable previews work; requested entries have no playback controls or audio requests. |
 | FR-02 | Selection precedes Start Fight; no music autoplays on page load. | Fresh page is silent; Start begins selected track and fight. |
 | FR-03 | Hero fights automatically using punches, kicks, dodges, throws/launches, and a finisher. | Each track's cue sheet and capture show the planned moves. |
 | FR-04 | Opponents react to contact; visual impacts align to marked beats. | Audio/video capture and cue audit show hit alignment. |
-| FR-05 | Arena includes dance floor, DJ booth and animated DJ, audience silhouettes, and beat-responsive lights. | Visual review at multiple song sections. |
-| FR-06 | Camera keeps hits readable and does not clip through characters. | Recorded review of each choreography sequence. |
+| FR-05 | Arena includes a dance floor, human DJ with headphones, and human audience with staggered claps, raised arms, and fist pumps. Audience freezes on pause and becomes static under Reduced Motion. | Desktop/portrait visual review, paused capture, reduced-motion review. |
+| FR-06 | Anime-style cinematic shot families keep active fighters and contact readable, with continuous beat-based transitions and a fixed wide Reduced Motion option. | Desktop/portrait capture of each shot, aerial move, transition, pause, and reduced-motion setting; no clipping or obscured contact. |
 | FR-07 | Pause, resume, restart, change track, volume, and mute work. | Browser flow tests and manual device tests. |
 | FR-08 | End-of-track victory and replay/choose-track flow work. | Full playback of all three tracks. |
 | FR-09 | Loading, failed audio, failed asset, WebGL loss, and unsupported browser states explain recovery. | Failure injection and UI review. |
 | FR-10 | Credits, privacy, help/accessibility, and contact links are reachable from menu and fight overlay. | Keyboard and link audit. |
+| FR-11 | Humanoid fighters use expressive anime-inspired motion: flowing guard, accelerated combinations, directed dashes, aerial kicks, recoil/launch, and turning finisher, with stylized shading/accessories and readable localized effects. | Inspect desktop/portrait poses and transitions, clip speed ramps, pause/restart stability, reduced effects, and model-load retry. Owner art approval and full-track capture remain required. |
 
 ## Nonfunctional requirements
+
+FR-12: At least 50 uniquely identified motion profiles must be scheduled across playable songs, with a technique/discipline HUD and move book. Include boxing, kicks, judo-inspired throws, and fictional jutsu. Use continuous attack blending and limb-length-preserving IK; reserve at least 1,250 ms before the next attack after a launch/throw/finisher. Acceptance requires catalog coverage, motion tests, browser move-book checks, and owner visual review. Numerical differences alone do not establish authentic technique or polished animation.
 
 | ID | Requirement | Gate |
 | --- | --- | --- |
@@ -32,5 +35,11 @@ The visitor wants to select a song and watch a stylish fight synchronized to it.
 | NFR-07 | Release can be rolled back and rights-affected tracks can be disabled. | [Operations rehearsal](OPERATIONS.md). |
 
 ## Explicit v1 exclusions
+
+FR-14: Visitors can search the local catalog by song, artist, mood, and language, and filter All/English/Hindi/Instrumental/Other. Search and language intersect; unmatched results have a clear reset action. Requested songs stay unavailable, and a selection hidden by filtering cannot start. Controls have visible labels, keyboard focus, result announcements, and fit portrait widths. Acceptance: desktop/mobile filter and selection flow, including Hindi empty state and unavailable English entry.
+
+FR-15: Only the latest requested preview can start; cancel, selection/filter change, home navigation, and hidden-tab menu previews stop pending/current playback. Acceptance: out-of-order download and cancellation tests plus normal pause/resume regression. Intensity-aware draft cues leave quiet rests, use softer dodges, and retain heavy-move recovery; acceptance includes deterministic synthetic energy fixtures and human audition before publishing any imported track.
+
+FR-13: Support offline English/Hindi song authoring with language metadata, beat candidates, human-corrected timestamp arrays (including variable tempo), deterministic on-beat fight cues, exact recording hashes, and draft/review status. Acceptance: synthetic timing fixtures and original-recording integration tests; reject silence, malformed input/corrections, unreviewed publication, and audio/hash mismatches. Human full-song timing and rights approval is required for every added recording. Automatic detection currently assumes steady tempo; arbitrary-song accuracy and automatic musical-section/intensity interpretation are not accepted guarantees.
 
 No manual combat, leaderboards, login, social sharing, advertising, payments, user-uploaded music, live beat detection for arbitrary songs, streaming services, server, or database. These may be future projects, not hidden dependencies of v1.

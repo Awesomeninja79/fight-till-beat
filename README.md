@@ -1,8 +1,14 @@
 # Fight Till Beat
 
-Playable development build for a browser based 3D music-fighting experience. Three original code-generated demo tracks, a procedural disco arena, automatic choreography, controls, and browser checks are implemented locally. **No public deployment exists yet; rights, privacy contact, and release review remain open.**
+Playable development build for a browser based 3D music-fighting experience. Three original code-generated demo tracks, a procedural disco arena, skinned humanoid fighters, anime-style skeletal combat, cinematic camera shots, automatic choreography, controls, and browser checks are implemented locally. The character upgrade uses Quaternius CC0 assets; operator release review remains pending. The [public GitHub repository](https://github.com/Awesomeninja79/fight-till-beat) has `main` as its default branch and `dev` for ongoing work. The [public game](https://project-3te70.vercel.app/) is live on Vercel, with anonymous access and basic gameplay verified. Production deployment `dpl_AVTMY3GND6iBiRs8dbrEQkbxyrX6` uses commit `3dda054`. The owner authorized this public release; rights/operator review, privacy contact, accessibility, real-device performance, and full-track timing review remain open.
 
 Run locally after `pnpm install` with `pnpm dev`. Run logic/content/build checks with `pnpm check`; run browser flows with `pnpm test:e2e`.
+
+Music authoring: `pnpm music:analyze <recording.wav> <track-id> <en|hi|instrumental|other> <private-draft.json>` creates a review-only beat/fight map. Optional `--beats <beats.json>` uses corrected timestamps, including tempo changes. See [content pipeline](docs/CONTENT_PIPELINE.md) for format, correction, and publishing steps. No English/Hindi recordings or provider subscriptions have been acquired.
+
+Local music continuation adds title/artist/mood search, English/Hindi/Instrumental/Other filters, clear unavailable/empty states, and protection against overlapping preview requests. Draft fight generation now adapts rests/dodges/attacks to relative beat energy. Existing audio and authored demo cue maps are unchanged.
+
+Latest local revision: 50 named, parameterized fighting techniques, blended recovery and two-bone limb solving; human DJ and cheering audience; a move book and technique HUD. Three original songs remain playable. Lean On is a requested, non-playable entry awaiting the authorized recording. No remote music library is connected.
 
 Future project work follows the documentation upkeep rule in [AGENTS.md](AGENTS.md).
 
@@ -23,6 +29,7 @@ Future project work follows the documentation upkeep rule in [AGENTS.md](AGENTS.
 | How will accessibility be verified? | [docs/ACCESSIBILITY.md](docs/ACCESSIBILITY.md) |
 | How will quality and performance be tested? | [docs/QUALITY.md](docs/QUALITY.md) |
 | How will the app be released and run? | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md), [docs/OPERATIONS.md](docs/OPERATIONS.md) |
+| Which tools and Codex plugins are needed? | [docs/TOOLS_AND_PLUGINS.md](docs/TOOLS_AND_PLUGINS.md) |
 | Which choices are unresolved? | [docs/DECISIONS.md](docs/DECISIONS.md) |
 
 The documents describe intended controls. Checked release gates require evidence from the eventual built application; writing a plan does not count as passing a gate.

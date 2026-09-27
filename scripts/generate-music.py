@@ -200,6 +200,8 @@ def render_track(spec: dict, index: int) -> dict:
             kind = "kick"
         elif i % 2 == 0:
             kind = "punch"
+        elif i % 4 == 1 and bar % 4 in (1, 2):
+            kind = "punch"  # Beat-spaced jab/cross burst between heavier kicks.
         else:
             kind = "step"
         if kind != "step" or i % 4 == 1:
@@ -221,6 +223,7 @@ def render_track(spec: dict, index: int) -> dict:
         "artist": spec["artist"],
         "bpm": spec["bpm"],
         "durationSec": round(duration, 2),
+        "language": "instrumental",
         "mood": spec["mood"],
         "colors": spec["palette"],
         "audio": f'/audio/{spec["id"]}.wav',
@@ -233,10 +236,16 @@ def main() -> None:
     AUDIO.mkdir(parents=True, exist_ok=True)
     CONTENT.mkdir(parents=True, exist_ok=True)
     result = [render_track(track, index) for index, track in enumerate(TRACKS, start=1)]
+    catalog_path = CONTENT / "tracks.json"
+    if catalog_path.exists():
+        original_ids = {track["id"] for track in TRACKS}
+        result += [track for track in json.loads(catalog_path.read_text(encoding="utf-8")) if track["id"] not in original_ids]
     (CONTENT / "tracks.json").write_text(json.dumps(result, indent=2), encoding="utf-8")
+    import subprocess
+    subprocess.run(["node", str(CONTENT.parent.parent / "scripts" / "choreograph.mjs")], check=True)
     print("Generated", len(result), "tracks")
     for track in result:
-        print(track["title"], track["durationSec"], "seconds", track["audio"])
+        print(track["title"], track.get("durationSec", "pending"), "seconds", track.get("audio", "audio required"))
 
 
 if __name__ == "__main__":
