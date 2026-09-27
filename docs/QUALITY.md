@@ -21,7 +21,7 @@ FR-13 release gates: audition and correct every imported song, record real revie
 
 Vitest is designed for Vite projects; it does not replace a separate TypeScript type check. Playwright can run Chromium, Firefox, and WebKit projects, with mobile emulation. [Vitest](https://vitest.dev/guide/learn/writing-tests), [Playwright browsers](https://playwright.dev/docs/browsers).
 
-`.github/workflows/ci.yml` runs frozen installation, `pnpm check`, and Chromium/WebKit desktop plus mobile Chromium browser flows on `dev` and `main` pushes and pull requests. The initial `main` and `dev` runs at commit `4db7840` passed on GitHub. Local browser checks use installed Chrome; four desktop/mobile Chromium flows passed after the latest code edits. These results do not replace the manual timing, device, accessibility, or release reviews below.
+`.github/workflows/ci.yml` runs frozen installation, `pnpm check`, and Chromium/WebKit desktop plus mobile Chromium browser flows on `dev` and `main` pushes and pull requests. CI runs the Playwright projects with one worker because concurrent GPU-backed browser sessions closed Chromium on the Linux runner even though the same catalog flow passed locally; retries remain a diagnostic fallback, not a substitute for a clean run. The initial `main` and `dev` runs at commit `4db7840` passed on GitHub. Local browser checks use installed Chrome; the current catalog, transport, accessibility, missing-audio, and model-retry flows pass on desktop and mobile Chromium. These results do not replace the manual timing, device, accessibility, or release reviews below.
 
 ## Manual checks that automation cannot replace
 
